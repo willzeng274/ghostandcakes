@@ -27,7 +27,7 @@ const Home: NextPage = () => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
   }, 0.01);
-  function handleMouseOver(e: React.MouseEvent<HTMLDivElement, MouseEvent>): void {
+  function handleMouseOver(): void {
     alert("Game Over!");
     setCounter(0);
   }
@@ -35,7 +35,7 @@ const Home: NextPage = () => {
     setCakeX(Math.floor(Math.random() * (window.innerWidth-100)));
     setCakeY(Math.floor(Math.random() * (window.innerHeight-100)));
   }
-  function handleCakeClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>): void {
+  function handleCakeClick(): void {
     cakeRandom();
     setCounter(counter => {
       return counter + 1;
