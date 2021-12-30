@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import React from 'react'
-import { useInterval } from './helpers/useInterval'
+import { useInterval } from '../helpers/useInterval'
 
 const Home: NextPage = () => {
   const [rotate, setRotate] = React.useState<number>(0);
