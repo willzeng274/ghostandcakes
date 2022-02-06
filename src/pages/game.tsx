@@ -17,6 +17,11 @@ const Game: NextPage = () => {
   const [speed, setSpeed] = React.useState<number>(1);
   React.useEffect((): void => {
     window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
+    if (localStorage.getItem('banned') === '1') {
+      alert("You are banned from the game");
+      window.location.href = "/";
+      return;
+    }
     confirm("Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!");
   }, []);
   React.useEffect((): void => {
@@ -59,7 +64,13 @@ const Game: NextPage = () => {
     setCakeX(Math.floor(Math.random() * (window.innerWidth-100)));
     setCakeY(Math.floor(Math.random() * (window.innerHeight-100)));
   }
-  function handleCakeClick(): void {
+  function handleCakeClick(e: any): void {
+    if (!e.isTrusted) {
+      alert("Cheater alert! You are banned");
+      localStorage.setItem('banned', '1');
+      window.location.href = "/";
+      return;
+    }
     cakeRandom();
     setCounter(counter => {
       return counter + 1;
