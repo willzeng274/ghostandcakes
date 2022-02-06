@@ -44,7 +44,7 @@ const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>FREE VERSION</title>
+        <title>BUDGET VERSION</title>
         <meta name="description" content="Ghost and Cakes - a game made with $13 billion budget" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

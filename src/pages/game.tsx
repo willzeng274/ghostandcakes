@@ -3,6 +3,7 @@ import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
+import Router from 'next/router'
 
 const Game: NextPage = () => {
   const dispatch = useDispatch();
@@ -53,12 +54,18 @@ const Game: NextPage = () => {
       setSpeed(Math.floor((counter / 50) * 100) / 100);
     }
     if (Math.round(CX - ghostX - 50) === 0 && Math.round(CY-ghostY - 40) === 0) {
+      setCX(0);
+      setCY(0);
+      setCakeX(0);
+      setCakeY(0);
+      setGhostX(500);
+      setGhostY(500);
       handleMouseOver();
     }
   }, 0.01);
   function handleMouseOver(): void {
-    alert("Game Over!");
     setCounter(0);
+    alert("Game Over!");
   }
   function cakeRandom() {
     setCakeX(Math.floor(Math.random() * (window.innerWidth-100)));
