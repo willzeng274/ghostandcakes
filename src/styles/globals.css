@@ -7,8 +7,8 @@ body {
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  color: blue;
+  text-decoration: underline;
 }
 
 * {
@@ -16,6 +16,14 @@ a {
 }
 
 img {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.no-drag {
+  -webkit-user-drag: none;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
