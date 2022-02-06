@@ -7,6 +7,7 @@ import Router from 'next/router'
 
 const Game: NextPage = () => {
   const dispatch = useDispatch();
+  const MyRef = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
   const [ghostX, setGhostX] = React.useState<number>(500);
   const [ghostY, setGhostY] = React.useState<number>(500);
@@ -16,6 +17,13 @@ const Game: NextPage = () => {
   const [cakeY, setCakeY] = React.useState<number>(0);
   const [counter, setCounter] = React.useState<number>(0);
   const [speed, setSpeed] = React.useState<number>(1);
+  React.useEffect(() => {
+    const canv: any = MyRef.current;
+    const ctx = canv.getContext("2d");
+    ctx.clearRect(0, 0, canv.width, canv.height);
+    ctx.font = "30px Arial";
+    ctx.fillText("Points: " + String(counter), 0, 25);
+  }, [counter]);
   React.useEffect((): void => {
     window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
     if (localStorage.getItem('banned') === '1') {
@@ -90,7 +98,7 @@ const Game: NextPage = () => {
         <meta name="description" content="Ghost and Cakes - a game made with $13 billion budget" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <p>{counter}</p>
+      <canvas ref={MyRef} />
       <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} />
       <img alt="" onMouseOver={handleMouseOver} src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
     </div>
