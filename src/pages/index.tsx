@@ -17,44 +17,35 @@ interface Point {
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const [rotate, setRotate] = React.useState<number>(0);
-  const [ghostX, setGhostX] = React.useState<number>(0);
-  const [ghostY, setGhostY] = React.useState<number>(0);
+  const [ghostX, setGhostX] = React.useState<number>(500);
+  const [ghostY, setGhostY] = React.useState<number>(500);
   const [CX, setCX] = React.useState<number>(0);
   const [CY, setCY] = React.useState<number>(0);
   const [cakeX, setCakeX] = React.useState<number>(0);
   const [cakeY, setCakeY] = React.useState<number>(0);
   const [counter, setCounter] = React.useState<number>(0);
+  const [speed, setSpeed] = React.useState<number>(1);
   React.useEffect((): void => {
     window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
   }, []);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
-  function get_vector_length(vector: Vector): number {
-    return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-  }
+  // function get_vector_length(vector: Vector): number {
+  //   return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+  // }
   useInterval(function() {
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
-    let vector_AB: Vector = {x: ghostX - CX, y: ghostY - CY};
-    let cos_theta: number = -(vector_AB.y / get_vector_length(vector_AB)); 
-    let theta: number = Math.acos(cos_theta);
-    setGhostY(ghostY => {
-      return Math.round((ghostY + 1 * cos_theta) * 100) / 100;
-      let rotate = Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
-      // return Math.round(() * 100) / 100;
-      return Math.round((ghostY + 1 * Math.sin(rotate)) * 100) / 100;
+    const a: number = CX - ghostX - 50, b: number = CY-ghostY - 40, c: number = Math.sqrt(a**2 + b**2);
+    const ratio: number = speed/c, a1: number = a*ratio, b1 : number = b*ratio;
+    setGhostX((ghostX: number) => {
+      return ghostX + a1;
     });
-    setGhostX(ghostX => {
-      if (ghostX > CX) {
-        return Math.round((ghostX - 1 * Math.cos(theta)) * 100) / 100;
-      } else {
-        return Math.round((ghostX + 1 * Math.cos(theta)) * 100) / 100;
-      }
-      let rotate = Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
-      return Math.round((ghostX + 1 * Math.cos(rotate)) * 100) / 100;
-    });
+    setGhostY((ghostY: number) => {
+      return ghostY + b1;
+    })
   }, 0.01);
   function handleMouseOver(): void {
     alert("Game Over!");
