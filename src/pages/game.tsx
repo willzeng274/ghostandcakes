@@ -1,11 +1,11 @@
-import type { NextPage } from 'next'
+import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
 import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
-import Router from 'next/router'
+import { Fetch } from '../helpers/deta'
 
-const Game: NextPage = () => {
+const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const dispatch = useDispatch();
   const MyRef = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
@@ -16,7 +16,7 @@ const Game: NextPage = () => {
   const [cakeX, setCakeX] = React.useState<number>(0);
   const [cakeY, setCakeY] = React.useState<number>(0);
   const [counter, setCounter] = React.useState<number>(0);
-  const [speed, setSpeed] = React.useState<number>(1);
+  const [speed, setSpeed] = React.useState<number>(0.5);
   React.useEffect(() => {
     const canv: any = MyRef.current;
     const ctx = canv.getContext("2d");
@@ -25,12 +25,13 @@ const Game: NextPage = () => {
     ctx.fillText("Points: " + String(counter), 0, 25);
   }, [counter]);
   React.useEffect((): void => {
-    window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
+    window.addEventListener("mousemove", (e) => {if ((e?.target as any)?.classList[0] === "brah") {return;} console.log(e.target); setCX(e.clientX); setCY(e.clientY);});
     if (localStorage.getItem('banned') === '1') {
       alert("You are banned from the game");
       window.location.href = "/";
       return;
     }
+    console.log("LEADERBOARD: ", items);
     confirm("Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!");
   }, []);
   React.useEffect((): void => {
@@ -49,13 +50,13 @@ const Game: NextPage = () => {
       return ghostY + b1;
     })
     if (counter < 10) {
-      setSpeed(1);
+      setSpeed(0.5);
     } else if (counter < 20) {
-      setSpeed(1.25);
+      setSpeed(0.75);
     } else if (counter < 30) {
-      setSpeed(1.5);
+      setSpeed(1);
     } else if (counter < 50) {
-      setSpeed(1.75);
+      setSpeed(1.5);
     } else if (counter < 100) {
       setSpeed(2);
     } else {
@@ -71,7 +72,23 @@ const Game: NextPage = () => {
       handleMouseOver();
     }
   }, 0.01);
-  function handleMouseOver(): void {
+  function handleMouseOver() {
+    console.log(items);
+    if (counter >= items[items.length-1].points) {
+      // screw the leaderboard idea
+
+      // fetch("/api/views", {
+      //   method: "POST",
+      //   headers: {
+      //     Accept: '*',
+      //     "Content-Type": "application/json"
+      //   },
+      //   body: JSON.stringify({
+      //     name: prompt("Give name! You're on the leaderboard") || "user",
+      //     points: counter
+      //   })
+      // }).then((res) => res.json()).then((res) => console.log(res))
+    }
     setCounter(0);
     alert("Game Over!");
   }
@@ -92,13 +109,13 @@ const Game: NextPage = () => {
     });
   }
   return (
-    <div>
+    <div className="brah">
       <Head>
         <title>FREE VERSION</title>
         <meta name="description" content="Ghost and Cakes - a game made with $13 billion budget" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <canvas ref={MyRef} />
+      <canvas className="brah" ref={MyRef} />
       <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} />
       <img alt="" onMouseOver={handleMouseOver} src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
     </div>
@@ -106,3 +123,11 @@ const Game: NextPage = () => {
 }
 
 export default Game
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    props: {
+      items: (await Fetch()).sort((a, b) => -(a as any).points + (b as any).points)
+    }
+  }
+}

@@ -19,6 +19,10 @@ const Home: NextPage = () => {
             <Link href="/free">
                 <a>Lower Budget version of Ghost and Cakes</a>
             </Link>
+            <br />
+            <Link href="/chat">
+                <a>Global chat in case you can't talk</a>
+            </Link>
         </div>
     )
 }
