@@ -21,7 +21,7 @@ const Home: NextPage = () => {
             </Link>
             <br />
             <Link href="/chat">
-                <a>Global chat in case you can't talk</a>
+                <a>Global chat in case you can&apos;t talk</a>
             </Link>
         </div>
     )

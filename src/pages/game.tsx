@@ -4,9 +4,11 @@ import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
 import { Fetch } from '../helpers/deta'
+import useDeviceDetect from '../helpers/device'
 
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const dispatch = useDispatch();
+  const { isMobile } = useDeviceDetect();
   const MyRef = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
   const [ghostX, setGhostX] = React.useState<number>(500);
@@ -25,7 +27,12 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.fillText("Points: " + String(counter), 0, 25);
   }, [counter]);
   React.useEffect((): void => {
-    window.addEventListener("mousemove", (e) => {if ((e?.target as any)?.classList[0] === "brah") {return;} console.log(e.target); setCX(e.clientX); setCY(e.clientY);});
+    window.addEventListener("mousemove", (e) => {
+      if (isMobile && (e?.target as any)?.classList[0] !== "no-drag") {
+        return;
+      }
+      console.log(e.target); setCX(e.clientX); setCY(e.clientY);
+    });
     if (localStorage.getItem('banned') === '1') {
       alert("You are banned from the game");
       window.location.href = "/";

@@ -1,5 +1,5 @@
 
-export default function() {
+export default function Ws() {
     return <>Pls be patient I have the dumb</>
 }
 
