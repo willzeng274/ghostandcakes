@@ -1,6 +1,6 @@
 import { Deta } from 'deta'
 
-export const deta = Deta(process.env.PROJECT_KEY)
+export const deta = Deta(process.env.NEXT_PUBLIC_PROJECT_KEY)
 const db = deta.Base("gnc")
 
 export default db;
