@@ -56,7 +56,7 @@ const Chat = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (messageToSend.length < 1) {
+    if (messageToSend.trim().length < 1) {
       return;
     }
     await axios.post("/api/pusher", {
