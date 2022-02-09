@@ -30,7 +30,7 @@ const Chat = () => {
     cluster: process.env.NEXT_PUBLIC_CLUSTER
   });
   useEffect(() => {
-    let usrname = prompt("Username?");
+    let usrname: string = prompt("Username?");
     if (usrname.length > 10) {
       usrname = usrname.substring(0, 10);
     }
