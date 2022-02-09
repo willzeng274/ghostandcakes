@@ -30,11 +30,11 @@ const Chat = () => {
     cluster: process.env.NEXT_PUBLIC_CLUSTER
   });
   useEffect(() => {
-    let usrname: string = prompt("Username?");
+    let usrname: string = prompt("Username?") || "User_" + String(Math.floor(Math.random() * 1000));
     if (usrname.length > 10) {
       usrname = usrname.substring(0, 10);
     }
-    setSender(usrname || "User_" + String(Math.floor(Math.random() * 100)));
+    setSender(usrname);
     const channel = pusher.subscribe("chat");
     channel.bind("chat-event", function (data: any) {
       console.log("Received event")
