@@ -1,7 +1,6 @@
 import { Deta } from 'deta'
-import j from '../deta.json'
 
-export const deta = Deta(j.ProjectKey)
+export const deta = Deta(process.env.PROJECT_KEY)
 const db = deta.Base("gnc")
 
 export default db;

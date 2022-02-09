@@ -4,11 +4,10 @@ import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
 import { Fetch } from '../helpers/deta'
-import useDeviceDetect from '../helpers/device'
+// import useDeviceDetect from '../helpers/device'
 
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const dispatch = useDispatch();
-  const { isMobile } = useDeviceDetect();
   const MyRef = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
   const [ghostX, setGhostX] = React.useState<number>(500);
@@ -26,20 +25,29 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.font = "30px Arial";
     ctx.fillText("Points: " + String(counter), 0, 25);
   }, [counter]);
-  React.useEffect((): void => {
-    window.addEventListener("mousemove", (e) => {
+  React.useEffect((): any => {
+    const abc: any = window.addEventListener("mousemove", (e) => {
+      if (localStorage.getItem('banned') === '1') {
+        alert("You are banned from the game");
+        window.location.href = "/";
+        return;
+      }
+      const userAgent =
+        typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+      const isMobile = Boolean(
+        userAgent.match(
+          /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
+        )
+      );
       if (isMobile && (e?.target as any)?.classList[0] !== "no-drag") {
         return;
       }
-      console.log(e.target); setCX(e.clientX); setCY(e.clientY);
+      setCX(e.clientX);
+      setCY(e.clientY);
     });
-    if (localStorage.getItem('banned') === '1') {
-      alert("You are banned from the game");
-      window.location.href = "/";
-      return;
-    }
     console.log("LEADERBOARD: ", items);
     confirm("Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!");
+    return () => window.removeEventListener("mouseover", abc);
   }, []);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));

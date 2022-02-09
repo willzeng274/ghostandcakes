@@ -1,109 +1,111 @@
-import React from 'react'
-import SocketIOClient from 'socket.io-client'
+import { useEffect, useState } from "react";
+import Pusher from "pusher-js";
+import axios from "axios";
+import { useRouter } from "next/router";
 
-interface IMsg {
-    user: string;
-    msg: string;
-}
+const SendMessage = ({ handleSubmit, handleMessageChange, message}: any) => {
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={message}
+        onChange={handleMessageChange}
+        placeholder="start typing...."
+      />
+      <button
+        type="submit"
+      >
+        Send
+      </button>
+    </form>
+  );
+};
 
-const Msg: React.FC = () => {
-    const inputRef = React.useRef(null);
-  
-    const [connected, setConnected] = React.useState<boolean>(false);
-    const [username, setUsername] = React.useState<string>("");
-    const [chat, setChat] = React.useState<IMsg[]>([]);
-    const [msg, setMsg] = React.useState<string>("");
-  
-    React.useEffect((): any => {
-      const socket = (SocketIOClient as any).connect(process.env.BASE_URL, {
-        path: "/api/ws",
-      });
-  
-      socket.on("connect", () => {
-        console.log("SOCKET CONNECTED!", socket.id);
-        setConnected(true);
-      });
-  
-      socket.on("message", (message: IMsg) => {
-        chat.push(message);
-        setChat([...chat]);
-      });
-      setUsername(prompt("What is your preferred username?") || "User_" + String(new Date().getTime()).substr(-3))
-      if (socket) return () => socket.disconnect();
-    }, []);
-  
-    const sendMessage = async () => {
-      if (msg) {
-        const message: IMsg = {
-          user: username,
-          msg,
-        };
-
-        const resp = await fetch("/api/msg", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(message),
-        });
-  
-        if (resp.ok) setMsg("");
-      }
-  
-      (inputRef?.current as any)?.focus();
+const Chat = () => {
+  const router = useRouter();
+  const [chats, setChats] = useState<Array<any>>([]);
+  const [sender, setSender] = useState<string>("");
+  const [messageToSend, setMessageToSend] = useState<string>("");
+  const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY || "", {
+    cluster: process.env.NEXT_PUBLIC_CLUSTER
+  });
+  useEffect(() => {
+    setSender("User_" + String(Math.floor(Math.random() * 100)));
+    const channel = pusher.subscribe("chat");
+    channel.bind("chat-event", function (data: any) {
+      console.log("Received event")
+      setChats((prevState): Array<any> => [
+        ...prevState,
+        { sender: data.sender, message: data.message },
+      ]);
+    });
+    console.log("Reloaded")
+    return () => {
+      pusher.unsubscribe("chat");
     };
-  
-    return (
+  }, []);
+
+  const handleSignOut = () => {
+    pusher.unsubscribe("chat");
+    router.push("/");
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setMessageToSend("");
+    await axios.post("/api/pusher", {
+      message: messageToSend,
+      sender,
+    });
+  };
+
+  return (
+    <div>
       <div>
         <div>
           <div>
-            {chat.length ? (
-              chat.map((chat, i) => (
-                <div key={"msg_" + i}>
-                  <span style={{fontWeight: "bold"}}>
-                    {chat.user === username ? "Me" : chat.user}
-                  </span>
-                  : {chat.msg}
-                </div>
-              ))
-            ) : (
-              <div>
-                No chat messages
-              </div>
-            )}
-          </div>
-          <div>
             <div>
-              <div>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={msg}
-                  placeholder={connected ? "Type a message..." : "Connecting..."}
-                  disabled={!connected}
-                  onChange={(e) => {
-                    setMsg(e.target.value);
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      sendMessage();
-                    }
-                  }}
-                />
-              </div>
+              <p>
+                Hello, <span>{sender}</span>
+              </p>
               <div>
                 <button
-                  onClick={sendMessage}
-                  disabled={!connected}
+                  onClick={handleSignOut}
                 >
-                  SEND
+                  Sign out
                 </button>
               </div>
+            </div>
+
+            <div>
+              <h2>You&apos;re online.</h2>
+            </div>
+          </div>
+
+          <div>
+            CHAT BOX
+            <div style={{height: "70vh", width: "100%", overflowY: "scroll", border: "1px solid black"}}>
+              {chats.map((chat, id) => (
+                <div key={id}>
+                  <div>
+                    <b>{chat.sender === sender ? "You" : chat.sender}</b> : {chat.message.replaceAll("\\n", "\n")}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <SendMessage
+                message={messageToSend}
+                handleMessageChange={(e: any) => setMessageToSend(e.target.value)}
+                handleSubmit={handleSubmit}
+              />
             </div>
           </div>
         </div>
       </div>
-    );
-  };
-  
-  export default Msg;
+    </div>
+  );
+};
+
+export default Chat;

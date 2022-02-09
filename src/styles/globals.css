@@ -29,3 +29,7 @@ img {
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+
+div {
+  white-space: pre-wrap;
+} 
