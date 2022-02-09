@@ -30,7 +30,11 @@ const Chat = () => {
     cluster: process.env.NEXT_PUBLIC_CLUSTER
   });
   useEffect(() => {
-    setSender(prompt("Username?") || "User_" + String(Math.floor(Math.random() * 100)));
+    let usrname = prompt("Username?");
+    if (usrname.length > 10) {
+      usrname = usrname.substring(0, 10);
+    }
+    setSender(usrname || "User_" + String(Math.floor(Math.random() * 100)));
     const channel = pusher.subscribe("chat");
     channel.bind("chat-event", function (data: any) {
       console.log("Received event")
@@ -52,11 +56,14 @@ const Chat = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setMessageToSend("");
+    if (messageToSend.length < 1) {
+      return;
+    }
     await axios.post("/api/pusher", {
       message: messageToSend,
       sender,
     });
+    setMessageToSend("");
   };
 
   return (
