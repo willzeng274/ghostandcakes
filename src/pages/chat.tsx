@@ -30,7 +30,7 @@ const Chat = () => {
     cluster: process.env.NEXT_PUBLIC_CLUSTER
   });
   useEffect(() => {
-    setSender("User_" + String(Math.floor(Math.random() * 100)));
+    setSender(prompt("Username?") || "User_" + String(Math.floor(Math.random() * 100)));
     const channel = pusher.subscribe("chat");
     channel.bind("chat-event", function (data: any) {
       console.log("Received event")
