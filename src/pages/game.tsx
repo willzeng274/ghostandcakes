@@ -18,6 +18,9 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [cakeY, setCakeY] = React.useState<number>(0);
   const [counter, setCounter] = React.useState<number>(0);
   const [speed, setSpeed] = React.useState<number>(0.5);
+  const [ratio, setRatio] = React.useState<number>(1);
+  const [ratio2, setRatio2] = React.useState<number>(1);
+  const [mobile, setMobile] = React.useState<boolean>(false);
   React.useEffect(() => {
     const canv: any = MyRef.current;
     const ctx = canv.getContext("2d");
@@ -26,6 +29,20 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.fillText("Points: " + String(counter), 0, 25);
   }, [counter]);
   React.useEffect((): any => {
+    setRatio(100/window.visualViewport.height)
+    setRatio2(100/window.visualViewport.width)
+    window.visualViewport.addEventListener("resize", function() {
+      console.log(window.visualViewport.height, window.visualViewport.width)
+      setRatio(100/window.visualViewport.height)
+      setRatio2(100/window.visualViewport.width)
+    });
+    const userAgent =
+      typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    setMobile(Boolean(
+      userAgent.match(
+        /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
+      )
+    ));
     const abc: any = window.addEventListener("mousemove", (e) => {
       if (localStorage.getItem('banned') === '1') {
         alert("You are banned from the game");
@@ -107,9 +124,19 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCounter(0);
     alert("Game Over!");
   }
+  function between(x: number, min: number, max: number): boolean {
+    return x >= min && x <= max;
+  }
   function cakeRandom() {
-    setCakeX(Math.floor(Math.random() * (window.innerWidth-100)));
-    setCakeY(Math.floor(Math.random() * (window.innerHeight-100)));
+    let [randX, randY]: [number, number] = [Math.floor(Math.random() * (window.innerWidth-100)), Math.floor(Math.random() * (window.innerHeight-100))]
+    while (between(randX, ghostX-100, ghostX+100)) {
+      randX = Math.floor(Math.random() * (window.innerWidth-100));
+    }
+    while (between(randY, ghostY-100, ghostY+100)) {
+      randY = Math.floor(Math.random() * (window.innerHeight-100));
+    }
+    setCakeX(randX);
+    setCakeY(randY);
   }
   function handleCakeClick(e: any): void {
     if (!e.isTrusted) {
@@ -131,8 +158,20 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <canvas className="brah" ref={MyRef} />
-      <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} />
-      <img alt="" onMouseOver={handleMouseOver} src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
+      <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`, width: mobile ? "30vw" : "10vw", height: "auto"}} />
+      <img
+        alt=""
+        onMouseOver={handleMouseOver}
+        src="/ghost.png" width={100} height={100}
+        style={{
+          position: "fixed",
+          top: `${ghostY * ratio}vh`,
+          left: `${ghostX * ratio2}vw`,
+          transform: `rotate(${rotate}deg)`,
+          width: mobile ? "30vw" :"10vw",
+          height: "auto"
+        }}
+      />
     </div>
   )
 }
