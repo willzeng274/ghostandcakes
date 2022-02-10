@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
-import 'firebase/compat/analytics';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
@@ -22,12 +21,15 @@ const clientCredentials = {
 firebase.initializeApp(clientCredentials);
 
 const auth: any = firebase.auth();
-const firestore: any = firebase.firestore();
+export const firestore: any = firebase.firestore();
 
 function App() {
 
-  const [user] = useAuthState(auth);
-
+  const [user]: any[] = useAuthState(auth);
+  function allowEmail(email: string): boolean {
+    console.log(email, process.env.NEXT_PUBLIC_ONE, process.env.NEXT_PUBLIC_TWO, email.endsWith(process.env.NEXT_PUBLIC_ONE as string))
+    return [process.env.NEXT_PUBLIC_ONE, process.env.NEXT_PUBLIC_TWO, "capitalismdiscordbot@gmail.com"].map((e: any) => email.endsWith(e)).some((ele) => !!ele)
+  }
   return (
     <div className="App">
       <header>
@@ -35,7 +37,7 @@ function App() {
       </header>
 
       <section>
-        {user ? <ChatRoom /> : <SignIn />}
+        {user ? allowEmail(auth.currentUser.email) ? <ChatRoom /> : <>Sorry, you are not allowed to use the chat. For privacy reasons you need to join the creator&apos;s school.</> : <SignIn />}
       </section>
 
     </div>
@@ -52,7 +54,7 @@ function SignIn() {
   return (
     <>
       <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
-      <p>Do not violate the community guidelines or you will be banned for life!</p>
+      <p>Be polite! If you're reported you can get banned.</p>
     </>
   )
 
