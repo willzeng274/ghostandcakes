@@ -54,7 +54,7 @@ function SignIn() {
   return (
     <>
       <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
-      <p>Be polite! If you're reported you can get banned.</p>
+      <p>Be polite! If you&apos;re reported you can get banned.</p>
     </>
   )
 
