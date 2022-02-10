@@ -65,7 +65,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     console.log("LEADERBOARD: ", items);
     confirm("Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!");
     return () => window.removeEventListener("mouseover", abc);
-  }, []);
+  }, [items]);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);

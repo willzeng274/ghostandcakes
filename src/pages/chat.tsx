@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Pusher from "pusher-js";
 import axios from "axios";
 import { useRouter } from "next/router";
@@ -26,9 +26,9 @@ const Chat = () => {
   const [chats, setChats] = useState<Array<any>>([]);
   const [sender, setSender] = useState<string>("");
   const [messageToSend, setMessageToSend] = useState<string>("");
-  const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY || "", {
+  const pusher = React.useMemo(() => new Pusher(process.env.NEXT_PUBLIC_APP_KEY || "", {
     cluster: process.env.NEXT_PUBLIC_CLUSTER
-  });
+  }), []);
   useEffect(() => {
     let usrname: string = prompt("Username?") || "User_" + String(Math.floor(Math.random() * 1000));
     if (usrname.length > 10) {
@@ -47,7 +47,7 @@ const Chat = () => {
     return () => {
       pusher.unsubscribe("chat");
     };
-  }, []);
+  }, [pusher]);
 
   const handleSignOut = () => {
     pusher.unsubscribe("chat");
