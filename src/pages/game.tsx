@@ -21,13 +21,19 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [ratio, setRatio] = React.useState<number>(1);
   const [ratio2, setRatio2] = React.useState<number>(1);
   const [mobile, setMobile] = React.useState<boolean>(false);
-  React.useEffect(() => {
+  const [start, setStart] = React.useState<boolean>(false);
+  const [over, setOver] = React.useState<boolean>(false);
+  const [lb, setLb] = React.useState<number>(0);
+  React.useEffect((): void => {
+    if (!start || over) {
+      return;
+    }
     const canv: any = MyRef.current;
     const ctx = canv.getContext("2d");
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.font = "30px Arial";
     ctx.fillText("Points: " + String(counter), 0, 25);
-  }, [counter]);
+  }, [counter, start, over]);
   React.useEffect((): any => {
     setRatio(100/window.visualViewport.height)
     setRatio2(100/window.visualViewport.width)
@@ -63,9 +69,36 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       setCY(e.clientY);
     });
     console.log("LEADERBOARD: ", items);
-    confirm("Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!");
     return () => window.removeEventListener("mouseover", abc);
   }, [items]);
+  React.useEffect(() => {
+    if (!localStorage.getItem("lb")) {
+      localStorage.setItem("lb", String(lb))
+    } else {
+      setLb(+(localStorage.getItem("lb") as string))
+    }
+  }, [])
+  React.useEffect(() => {
+    if (lb > 0) {
+      localStorage.setItem("lb", String(lb))
+    }
+  }, [lb])
+  React.useEffect(() => {
+    const ab: any = window.addEventListener("keyup", () => {
+      if (over) {
+        setOver(false);
+      }
+    });
+    return () => window.removeEventListener("keyup", ab);
+  }, [over]);
+  React.useEffect(() => {
+    const ab: any = window.addEventListener("keyup", () => {
+      if (!start) {
+        setStart(true);
+      }
+    });
+    return () => window.removeEventListener("keyup", ab);
+  }, [start])
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
@@ -94,18 +127,24 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     } else {
       setSpeed(Math.floor((counter / 50) * 100) / 100);
     }
-    if (Math.round(CX - ghostX - 50) === 0 && Math.round(CY-ghostY - 40) === 0) {
-      setCX(0);
-      setCY(0);
-      setCakeX(0);
-      setCakeY(0);
-      setGhostX(500);
-      setGhostY(500);
-      handleMouseOver();
+    if (Math.round(CX - ghostX - 50) === 0 && Math.round(CY- ghostY - 40) === 0) {
+      if (!over) {
+        handleMouseOver();
+      }
     }
   }, 0.01);
   function handleMouseOver() {
+    setCX(0);
+    setCY(0);
+    setCakeX(0);
+    setCakeY(0);
+    setGhostX(500);
+    setGhostY(500);
     console.log(items);
+    console.log(counter, lb)
+    if (counter > lb) {
+      setLb(counter);
+    }
     if (counter >= items[items.length-1].points) {
       // screw the leaderboard idea
 
@@ -122,7 +161,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       // }).then((res) => res.json()).then((res) => console.log(res))
     }
     setCounter(0);
-    alert("Game Over!");
+    setOver(true);
   }
   function between(x: number, min: number, max: number): boolean {
     return x >= min && x <= max;
@@ -157,21 +196,39 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
         <meta name="description" content="Ghost and Cakes - a game made with $13 billion budget" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <canvas className="brah" ref={MyRef} />
-      <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`, width: mobile ? "30vw" : "10vw", height: "auto"}} />
-      <img
-        alt=""
-        onMouseOver={handleMouseOver}
-        src="/ghost.png" width={100} height={100}
-        style={{
-          position: "fixed",
-          top: `${ghostY * ratio}vh`,
-          left: `${ghostX * ratio2}vw`,
-          transform: `rotate(${rotate}deg)`,
-          width: mobile ? "30vw" :"10vw",
-          height: "auto"
-        }}
-      />
+      {
+        start ? 
+          !over ?
+            <>
+              <canvas className="brah" ref={MyRef} />
+              <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`, width: mobile ? "30vw" : "10vw", height: "auto"}} />
+              <img
+                alt=""
+                onMouseOver={handleMouseOver}
+                src="/ghost.png" width={100} height={100}
+                style={{
+                  position: "fixed",
+                  top: `${ghostY * ratio}vh`,
+                  left: `${ghostX * ratio2}vw`,
+                  transform: `rotate(${rotate}deg)`,
+                  width: mobile ? "30vw" :"10vw",
+                  height: "auto"
+                }}
+              />
+            </>
+          :
+            <>
+              <p>Game Over!</p>
+              <p>Personal Best: {lb}</p>
+              <p>Note: This is information is stored in your browser.</p>
+              <button onClick={() => setOver(false)}>Restart</button>
+            </>
+        :
+          <>
+            <button onClick={() => setStart(true)}>Start Game</button>
+            <p>Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!</p>
+          </>
+      }
     </div>
   )
 }
