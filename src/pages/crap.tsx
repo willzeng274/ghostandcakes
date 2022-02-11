@@ -45,9 +45,9 @@ const Home: NextPage = () => {
     let theta: number = Math.acos(cos_theta);
     setGhostY(ghostY => {
       if (ghostY < CY) {
-        return Math.round((ghostY + 1 * cos_theta) * 100) / 100;
+        return Math.round((ghostY + 3 * cos_theta) * 100) / 100;
       } else {
-        return Math.round((ghostY - 1 * cos_theta) * 100) / 100;
+        return Math.round((ghostY - 3 * cos_theta) * 100) / 100;
       }
     });
 //     setGhostX(ghostX => {
