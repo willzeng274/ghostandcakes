@@ -28,7 +28,7 @@ function App() {
   const [user]: any[] = useAuthState(auth);
   function allowEmail(email: string): boolean {
     console.log(email, process.env.NEXT_PUBLIC_ONE, process.env.NEXT_PUBLIC_TWO, email.endsWith(process.env.NEXT_PUBLIC_ONE as string))
-    return [process.env.NEXT_PUBLIC_ONE, process.env.NEXT_PUBLIC_TWO, "capitalismdiscordbot@gmail.com"].map((e: any) => email.endsWith(e)).some((ele) => !!ele)
+    return ["ddsbstudent.ca", "ddsb.ca", "capitalismdiscordbot@gmail.com"].map((e: any) => email.endsWith(e)).some((ele) => !!ele)
   }
   return (
     <div className="App">
@@ -76,14 +76,19 @@ function ChatRoom() {
 
   const [formValue, setFormValue] = useState('');
 
+  React.useEffect((): any => {
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const sendMessage = async (e: any) => {
     e.preventDefault();
-
+    if (formValue.trim().length < 1) {
+        return;
+    }
     const { uid, displayName } = auth.currentUser;
 
     await messagesRef.add({
-      text: formValue,
+      text: formValue.trim(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid,
       displayName
@@ -94,7 +99,7 @@ function ChatRoom() {
   }
 
   return (<>
-    <main>
+    <main style={{height: "80vh", width: "100%", overflowY: "scroll"}}>
 
       {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
 
