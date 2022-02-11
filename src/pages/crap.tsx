@@ -17,8 +17,8 @@ interface Point {
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const [rotate, setRotate] = React.useState<number>(0);
-  const [ghostX, setGhostX] = React.useState<number>(0);
-  const [ghostY, setGhostY] = React.useState<number>(0);
+//   const [ghostX, setGhostX] = React.useState<number>(50);
+  const [ghostY, setGhostY] = React.useState<number>(10);
   const [CX, setCX] = React.useState<number>(0);
   const [CY, setCY] = React.useState<number>(0);
   const [cakeX, setCakeX] = React.useState<number>(0);
@@ -50,13 +50,13 @@ const Home: NextPage = () => {
         return Math.round((ghostY - 1 * cos_theta) * 100) / 100;
       }
     });
-    setGhostX(ghostX => {
-      if (ghostX < CX) {
-        return Math.round((ghostX + 1 * Math.sin(theta)) * 100) / 100;
-      } else {
-        return Math.round((ghostX - 1 * Math.sin(theta)) * 100) / 100;
-      }
-    });
+//     setGhostX(ghostX => {
+//       if (ghostX < CX) {
+//         return Math.round((ghostX + 1 * Math.sin(theta)) * 100) / 100;
+//       } else {
+//         return Math.round((ghostX - 1 * Math.sin(theta)) * 100) / 100;
+//       }
+//     });
   }, 0.01);
   function handleMouseOver(): void {
     alert("Game Over!");
