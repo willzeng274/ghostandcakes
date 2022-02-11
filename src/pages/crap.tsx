@@ -37,17 +37,17 @@ const Home: NextPage = () => {
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
-    let vector_AB: Vector = {x: ghostX - CX, y: ghostY - CY};
-    let vector_AC: Vector = {x: ghostX - CX, y: 0};
+    let vector_AB: Vector = {x: ghostX - (CX-25), y: ghostY - CY};
+    let vector_AC: Vector = {x: ghostX - (CX-25), y: 0};
     let AB_DOT_AC: number = vector_AB.x * vector_AC.x
     let length_AB_AC: number = get_vector_length(vector_AB) * get_vector_length(vector_AC);
     let cos_theta: number = AB_DOT_AC / length_AB_AC;
     let theta: number = Math.acos(cos_theta);
     setGhostY(ghostY => {
       if (ghostY < CY) {
-        return Math.round((ghostY + 3 * cos_theta - 25) * 100) / 100
+        return Math.round((ghostY + 3 * cos_theta) * 100) / 100
       } else {
-        return Math.round((ghostY - 3 * cos_theta + 25) * 100) / 100;
+        return Math.round((ghostY - 3 * cos_theta) * 100) / 100;
       }
     });
 //     setGhostX(ghostX => {
