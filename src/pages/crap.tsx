@@ -37,7 +37,7 @@ const Home: NextPage = () => {
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
-    let vector_AB: Vector = {x: ghostX - CX, y: ghostY - (CY-25)};
+    let vector_AB: Vector = {x: ghostX - CX, y: ghostY - CY};
     let vector_AC: Vector = {x: ghostX - CX, y: 0};
     let AB_DOT_AC: number = vector_AB.x * vector_AC.x
     let length_AB_AC: number = get_vector_length(vector_AB) * get_vector_length(vector_AC);
@@ -81,7 +81,7 @@ const Home: NextPage = () => {
       </Head>
       <p>{counter}</p>
       <img onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} />
-      <img alt="" onMouseOver={handleMouseOver} src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
+      <img alt="" onMouseOver={handleMouseOver} src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY-25}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
     </div>
   )
 }
