@@ -7,6 +7,7 @@ import 'firebase/compat/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { enableIndexedDbPersistence } from 'firebase/firestore';
+import { useInterval } from '../helpers/useInterval';
 
 const clientCredentials = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -28,6 +29,21 @@ function App() {
   const [user]: any[] = useAuthState(auth);
   const [allowed, setAllowed] = useState<boolean>(false);
   const [requested, setRequested] = useState<boolean>(false);
+  useInterval(() => {
+    (async () => {
+      if (user?.uid) {
+        const messagesRef = firestore.collection('messages');
+        const now = Date.now();
+        const cutoff = now/1000 - 1 * 24 * 60 * 60;
+        const old = await messagesRef.orderBy('createdAt').get();
+        const deleted = old.docs.map((doc: any) => { return {data: doc.data(), id: doc.id} }).filter((doc: any) => doc.data.createdAt.seconds < cutoff);
+        deleted.forEach((item: any) => {
+          messagesRef.doc(item.id).delete().then(() => {
+          })
+        })
+      }
+    })()
+  }, 1);
   function allowEmail(email: string): any {
     fetch("/api/email", {
       method: "POST",
