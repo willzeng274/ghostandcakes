@@ -98,7 +98,18 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       }
     });
     return () => window.removeEventListener("keyup", ab);
-  }, [start])
+  }, [start]);
+  React.useEffect(() => {
+    const ab: any = window.addEventListener("mouseup", () => {
+      if (!start) {
+        setStart(true);
+      }
+      if (over) {
+        setOver(false);
+      }
+    });
+    return () => window.removeEventListener("mouseup", ab)
+  }, [start, over]);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
