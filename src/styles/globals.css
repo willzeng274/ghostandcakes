@@ -32,4 +32,9 @@ img {
 
 div {
   white-space: pre-wrap;
-} 
+}
+
+.sent {
+  text-align: right;
+  margin-right: 2.5%;
+}

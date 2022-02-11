@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
@@ -6,6 +6,7 @@ import 'firebase/compat/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { enableIndexedDbPersistence } from 'firebase/firestore';
 
 const clientCredentials = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -24,11 +25,36 @@ const auth: any = firebase.auth();
 export const firestore: any = firebase.firestore();
 
 function App() {
-
   const [user]: any[] = useAuthState(auth);
-  function allowEmail(email: string): boolean {
-    console.log(email, process.env.NEXT_PUBLIC_ONE, process.env.NEXT_PUBLIC_TWO, email.endsWith(process.env.NEXT_PUBLIC_ONE as string))
-    return ["ddsbstudent.ca", "ddsb.ca", "capitalismdiscordbot@gmail.com"].map((e: any) => email.endsWith(e)).some((ele) => !!ele)
+  const [allowed, setAllowed] = useState<boolean>(false);
+  const [requested, setRequested] = useState<boolean>(false);
+  function allowEmail(email: string): any {
+    fetch("/api/email", {
+      method: "POST",
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email
+      })
+    })
+      .then((res: Response) => res.json())
+      .then((res: {message: boolean}) => {
+        setRequested(true);
+        setAllowed(res.message);
+      });
+    return (
+      <>
+        {
+          requested
+            ?
+              "Sorry, you are not allowed to use the chat. For privacy reasons you need to join the creator's school."
+            :
+              "Loading..."
+        } 
+      </>
+    )
   }
   return (
     <div className="App">
@@ -37,7 +63,7 @@ function App() {
       </header>
 
       <section>
-        {user ? allowEmail(auth.currentUser.email) ? <ChatRoom /> : <>Sorry, you are not allowed to use the chat. For privacy reasons you need to join the creator&apos;s school.</> : <SignIn />}
+        {user ? allowed ? <ChatRoom /> : allowEmail(user.email) : <SignIn />}
       </section>
 
     </div>
@@ -61,8 +87,15 @@ function SignIn() {
 }
 
 function SignOut() {
+  const [clicked, setClicked] = useState<boolean>(false);
+  useEffect(() => {
+    if (clicked) {
+      auth.signOut();
+      window.location.href = "/";
+    }
+  }, [clicked])
   return auth.currentUser && (
-    <button className="sign-out" onClick={() => auth.signOut()}>Sign Out</button>
+    <button className="sign-out" onClick={() => setClicked(true)}>Sign Out</button>
   )
 }
 
@@ -72,7 +105,7 @@ function ChatRoom() {
   const messagesRef = firestore.collection('messages');
   const query = messagesRef.orderBy('createdAt').limit(25);
 
-  const [messages] = useCollectionData(query, { idField: 'id' } as any);
+  const [messages] = useCollectionData(query, { idField: 'id' });
 
   const [formValue, setFormValue] = useState('');
 
@@ -98,10 +131,32 @@ function ChatRoom() {
     dummy.current.scrollIntoView({ behavior: 'smooth' });
   }
 
-  return (<>
-    <main style={{height: "80vh", width: "100%", overflowY: "scroll"}}>
+  async function deleteMessage(e: any, id: any, uid: any) {
+    e.preventDefault();
+    if (uid != auth.currentUser.uid) {
+      return;
+    }
+    await messagesRef.doc(id).delete()
+  }
 
-      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+  async function editMessage(e: any, id: any, uid: any) {
+    e.preventDefault();
+    if (uid != auth.currentUser.uid) {
+      return;
+    }
+    if (formValue.trim().length < 1) {
+      return;
+    }
+    await messagesRef.doc(id).update({
+      text: formValue.trim()
+    })
+    setFormValue("");
+  }
+
+  return (<>
+    <main style={{height: "90vh", width: "100%", overflowY: "scroll"}}>
+
+      {messages && messages.map((msg: any, index: any) => <ChatMessage key={index} message={msg} delet={deleteMessage} edit={editMessage} />)}
 
       <span ref={dummy}></span>
 
@@ -119,17 +174,19 @@ function ChatRoom() {
 
 
 function ChatMessage(props: any) {
-  const { text, uid, displayName } = props.message;
+  const { text, uid, displayName, id }: any = props.message;
+  const { delet, edit } = props;
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
 
-  return (<>
+  return (
     <div className={`message ${messageClass}`}>
       <b>{displayName}</b>
       <p>{text}</p>
+      <button onClick={(e: any) => delet(e, id, uid)}>Delete</button>
+      <button onClick={(e: any) => edit(e, id, uid)}>Edit</button>
     </div>
-  </>)
+  )
 }
-
 
 export default App;
