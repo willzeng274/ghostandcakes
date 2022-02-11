@@ -17,7 +17,7 @@ interface Point {
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const [rotate, setRotate] = React.useState<number>(0);
-//   const [ghostX, setGhostX] = React.useState<number>(50);
+  const [ghostX, setGhostX] = React.useState<number>(50);
   const [ghostY, setGhostY] = React.useState<number>(10);
   const [CX, setCX] = React.useState<number>(0);
   const [CY, setCY] = React.useState<number>(0);
