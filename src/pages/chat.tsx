@@ -6,7 +6,6 @@ import 'firebase/compat/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { enableIndexedDbPersistence } from 'firebase/firestore';
 import { useInterval } from '../helpers/useInterval';
 
 const clientCredentials = {

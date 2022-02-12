@@ -9,6 +9,7 @@ import { Fetch } from '../helpers/deta'
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const dispatch = useDispatch();
   const MyRef = React.useRef(null);
+  const CakeRef = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
   const [ghostX, setGhostX] = React.useState<number>(500);
   const [ghostY, setGhostY] = React.useState<number>(500);
@@ -18,12 +19,12 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [cakeY, setCakeY] = React.useState<number>(0);
   const [counter, setCounter] = React.useState<number>(0);
   const [speed, setSpeed] = React.useState<number>(0.5);
-  const [ratio, setRatio] = React.useState<number>(1);
-  const [ratio2, setRatio2] = React.useState<number>(1);
+  const [bratio, setBratio] = React.useState<number>(1);
   const [mobile, setMobile] = React.useState<boolean>(false);
   const [start, setStart] = React.useState<boolean>(false);
   const [over, setOver] = React.useState<boolean>(false);
   const [lb, setLb] = React.useState<number>(0);
+  const [zoom, setZoom] = React.useState<boolean>(false);
   React.useEffect((): void => {
     if (!start || over) {
       return;
@@ -35,13 +36,6 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.fillText("Points: " + String(counter), 0, 25);
   }, [counter, start, over]);
   React.useEffect((): any => {
-    setRatio(100/window.visualViewport.height)
-    setRatio2(100/window.visualViewport.width)
-    window.visualViewport.addEventListener("resize", function() {
-      console.log(window.visualViewport.height, window.visualViewport.width)
-      setRatio(100/window.visualViewport.height)
-      setRatio2(100/window.visualViewport.width)
-    });
     const userAgent =
       typeof window.navigator === "undefined" ? "" : navigator.userAgent;
     setMobile(Boolean(
@@ -110,15 +104,26 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     });
     return () => window.removeEventListener("mouseup", ab)
   }, [start, over]);
+  React.useEffect(() => {
+    if (bratio !== 1) {
+      setZoom(true);
+    } else {
+      setZoom(false);
+    }
+  }, [bratio]);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
   useInterval(function() {
+    const brio: number = Math.round(window.devicePixelRatio * 100) / 200;
+    if (bratio !== brio) {
+      setBratio(brio);
+    }
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
     const a: number = CX - ghostX - 50, b: number = CY-ghostY - 40, c: number = Math.sqrt(a**2 + b**2);
-    const ratio: number = speed/c, a1: number = a*ratio, b1 : number = b*ratio;
+    const ratio: number = (speed)/c, a1: number = a*ratio, b1 : number = b*ratio;
     setGhostX((ghostX: number) => {
       return ghostX + a1;
     });
@@ -151,8 +156,6 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCakeY(0);
     setGhostX(500);
     setGhostY(500);
-    console.log(items);
-    console.log(counter, lb)
     if (counter > lb) {
       setLb(counter);
     }
@@ -189,7 +192,8 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCakeY(randY);
   }
   function handleCakeClick(e: any): void {
-    if (!e.isTrusted) {
+    const cakeR: any = CakeRef.current
+    if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
       window.location.href = "/";
@@ -201,7 +205,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     });
   }
   return (
-    <div className="brah">
+    <div>
       <Head>
         <title>FREE VERSION</title>
         <meta name="description" content="Ghost and Cakes - a game made with $13 billion budget" />
@@ -210,23 +214,43 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       {
         start ? 
           !over ?
-            <>
-              <canvas className="brah" ref={MyRef} />
-              <img className="no-drag" onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`, width: mobile ? "30vw" : "10vw", height: "auto"}} />
-              <img
-                alt=""
-                onMouseOver={handleMouseOver}
-                src="/ghost.png" width={100} height={100}
-                style={{
-                  position: "fixed",
-                  top: `${ghostY * ratio}vh`,
-                  left: `${ghostX * ratio2}vw`,
-                  transform: `rotate(${rotate}deg)`,
-                  width: mobile ? "30vw" :"10vw",
-                  height: "auto"
-                }}
-              />
-            </>
+            !zoom ?
+              <>
+                <canvas ref={MyRef} />
+                <img
+                  ref={CakeRef}
+                  className={"no-drag"}
+                  onClick={handleCakeClick}
+                  src="/cake-a.svg"
+                  alt=""
+                  style={
+                    {
+                      position: "fixed",
+                      top: `${cakeY}px`,
+                      left: `${cakeX}px`,
+                      width: mobile ? "30vw" : "10vw",
+                      height: "auto",
+                    }
+                  }
+                />
+                <img
+                  alt=""
+                  onMouseOver={handleMouseOver}
+                  src="/ghost.png" width={100} height={100}
+                  style={{
+                    position: "fixed",
+                    top: `${ghostY}px`,
+                    left: `${ghostX}px`,
+                    transform: `rotate(${rotate}deg)`,
+                    width: mobile ? "30vw" :"10vw",
+                    height: "auto"
+                  }}
+                />
+              </>
+            :
+              <>
+                {"Please update your zoom level. This game cannot be played when zoomed in or out."}
+              </>
           :
             <>
               <p>Game Over!</p>

@@ -42,7 +42,7 @@ const Home: NextPage = () => {
     let AB_DOT_AC: number = vector_AB.x * vector_AC.x
     let length_AB_AC: number = get_vector_length(vector_AB) * get_vector_length(vector_AC);
     let cos_theta: number = AB_DOT_AC / length_AB_AC;
-    let theta: number = Math.acos(cos_theta);
+    // let theta: number = Math.acos(cos_theta);
     setGhostY(ghostY => {
       if (ghostY < CY) {
         return Math.round((ghostY + 3 * cos_theta) * 100) / 100
