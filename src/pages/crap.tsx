@@ -20,11 +20,13 @@ interface Invader {
   top: number;
 }
  
+const ghostX = 50;
+
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const player = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
-  const [ghostX, setGhostX] = React.useState<number>(50);
+  // const [ghostX, setGhostX] = React.useState<number>(50);
   const [ghostY, setGhostY] = React.useState<number>(10);
   const [CX, setCX] = React.useState<number>(0);
   const [CY, setCY] = React.useState<number>(0);
@@ -32,9 +34,29 @@ const Home: NextPage = () => {
   const [bullets, setBullets] = React.useState<IBullet[]>([]);
   const [invaders, setInvaders] = React.useState<Invader[]>([]);
   const [over, setOver] = React.useState<boolean>(false);
+  const [mobile, setMobile] = React.useState<boolean>(false);
+  const [orientation, setOrientation] = React.useState<string>("");
   React.useEffect((): any => {
-    const abc: any = window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
-    return () => window.removeEventListener('mousemove', abc);
+    const userAgent =
+      typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    const m = Boolean(
+      userAgent.match(
+        /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
+      )
+    );
+    let orientation;
+    if (m) {
+      orientation = !window.screen.orientation.angle ? 'portrait' : 'landscape';
+      setOrientation(orientation)
+    }
+    setMobile(m);
+    if (m) {
+      const abc: any = window.addEventListener("touchmove", (e) => {setCX(e.touches[0].clientX); setCY(e.touches[0].clientY);});
+      return () => window.removeEventListener("touchmove", abc);
+    } else {
+      const abc: any = window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
+      return () => window.removeEventListener('mousemove', abc);
+    }
   }, []);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
@@ -126,27 +148,32 @@ const Home: NextPage = () => {
       </Head>
       {
         !over ?
-          <>
-            <p>{counter}</p>
-            {/* <img src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} /> */}
-            <img ref={player} alt="" src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY-25}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
-            {bullets.map((i: IBullet, index: number) => <div style={{
-              position: "fixed",
-              top: `${i.top}px`,
-              left: `${i.left}px`,
-              height: "2vh",
-              width: "3vw",
-              backgroundColor: "purple"
-            }} key={index} id={`b_${index}`}></div>)}
-            {invaders.map((i: Invader, index: number) => <div style={{
-              position: "fixed",
-              top: `${i.top}px`,
-              right: `${i.right}px`,
-              height: "5vh",
-              width: "2vw",
-              backgroundColor: "green"
-            }} key={index} id={`i_${index}`}></div>)}
-          </>
+          mobile && orientation === "portrait" ?
+            <>
+              Please rotate your phone then refresh the webpage. This game works terrible in portrait mode.
+            </>
+          :
+            <>
+              <p>{counter}</p>
+              {/* <img src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} /> */}
+              <img ref={player} alt="" src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY-25}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
+              {bullets.map((i: IBullet, index: number) => <div style={{
+                position: "fixed",
+                top: `${i.top}px`,
+                left: `${i.left}px`,
+                height: "2vh",
+                width: "3vw",
+                backgroundColor: "purple"
+              }} key={index} id={`b_${index}`}></div>)}
+              {invaders.map((i: Invader, index: number) => <div style={{
+                position: "fixed",
+                top: `${i.top}px`,
+                right: `${i.right}px`,
+                height: "5vh",
+                width: "2vw",
+                backgroundColor: "green"
+              }} key={index} id={`i_${index}`}></div>)}
+            </>
         :
           <>
             {"Game Over!"}
