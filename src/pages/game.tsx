@@ -26,7 +26,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [lb, setLb] = React.useState<number>(0);
   const [zoom, setZoom] = React.useState<boolean>(false);
   React.useEffect((): void => {
-    if (!start || over) {
+    if (!start || over || zoom) {
       return;
     }
     const canv: any = MyRef.current;
@@ -34,7 +34,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.font = "30px Arial";
     ctx.fillText("Points: " + String(counter), 0, 25);
-  }, [counter, start, over]);
+  }, [counter, start, over, zoom]);
   React.useEffect((): any => {
     const userAgent =
       typeof window.navigator === "undefined" ? "" : navigator.userAgent;
