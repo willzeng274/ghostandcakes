@@ -23,6 +23,10 @@ const Home: NextPage = () => {
             <Link href="/chat">
                 <a>Global chat in case you can&apos;t talk</a>
             </Link>
+            <br />
+            <Link href="/crap">
+                <a>{"Totally not RIP-OFF of space invaders"}</a>
+            </Link>
         </div>
     )
 }

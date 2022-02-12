@@ -71,7 +71,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     } else {
       setLb(+(localStorage.getItem("lb") as string))
     }
-  }, [])
+  }, [lb]);
   React.useEffect(() => {
     if (lb > 0) {
       localStorage.setItem("lb", String(lb))
@@ -108,10 +108,9 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     if ((bratio !== 1 && !mobile) || (bratio !== 1.5 && mobile)) {
       setZoom(true);
     } else {
-      console.log(bratio, mobile)
       setZoom(false);
     }
-  }, [bratio]);
+  }, [bratio, mobile]);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
