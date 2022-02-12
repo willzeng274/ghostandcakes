@@ -105,9 +105,10 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     return () => window.removeEventListener("mouseup", ab)
   }, [start, over]);
   React.useEffect(() => {
-    if (bratio !== 1) {
+    if ((bratio !== 1 && !mobile) || (bratio !== 1.5 && mobile)) {
       setZoom(true);
     } else {
+      console.log(bratio, mobile)
       setZoom(false);
     }
   }, [bratio]);
@@ -123,7 +124,8 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
     const a: number = CX - ghostX - 50, b: number = CY-ghostY - 40, c: number = Math.sqrt(a**2 + b**2);
-    const ratio: number = (speed)/c, a1: number = a*ratio, b1 : number = b*ratio;
+    const sped: number = mobile ? speed * 1.5 : speed;
+    const ratio: number = (sped)/c, a1: number = a*ratio, b1 : number = b*ratio;
     setGhostX((ghostX: number) => {
       return ghostX + a1;
     });
