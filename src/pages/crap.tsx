@@ -220,7 +220,7 @@ const Home: NextPage = () => {
                       </SliderTrack>
                       <SliderThumb />
                     </Slider>
-                    <Slider width="50vw" aria-label='slider-ex-1' defaultValue={500} min={100} max={1000} step={1} onChange={(v: number) => setBulletSpawn(v)}>
+                    <Slider marginBottom={5} width="50vw" aria-label='slider-ex-1' defaultValue={500} min={100} max={1000} step={1} onChange={(v: number) => setBulletSpawn(v)}>
                       <SliderTrack>
                         <SliderFilledTrack />
                       </SliderTrack>
@@ -228,7 +228,7 @@ const Home: NextPage = () => {
                     </Slider>
                   </Flex>
                   <Text marginLeft={3}>
-                    {`Damage: ${dmg}\nSpawnRate: ${spawnRate === 0 ? spawnRateDefault : spawnRate === 5001 ? "NEVER" : spawnRate}ms ${spawnRate === 0 ? "DEFAULT" : ""}\nPerformance: Low\nBullet Speed: ${bulletSpeed}\nBullet Spawnrate: ${bulletSpawn}ms`}
+                    {`Damage: ${dmg}\nSpawnRate: ${spawnRate === 0 ? spawnRateDefault : spawnRate === 5001 ? "NEVER" : spawnRate}ms ${spawnRate === 0 ? "DEFAULT" : ""}\nBullet Speed: ${bulletSpeed}\nBullet Spawnrate: ${bulletSpawn}ms\nPerformance: Low`}
                   </Text>
                 </Flex>
                 <Text>

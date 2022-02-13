@@ -1,4 +1,3 @@
-import { rmSync } from 'fs';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import db, { Fetch } from '../../helpers/deta';
 
