@@ -72,7 +72,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     } else {
       setLb(+(localStorage.getItem("lb") as string))
     }
-  }, [lb]);
+  }, []);
   React.useEffect(() => {
     if (lb > 0) {
       localStorage.setItem("lb", String(lb))
@@ -265,7 +265,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
               <p>Score: {counter}</p>
               <p>Personal Best: {lb}</p>
               <p>Note: This is information is stored in your browser.</p>
-              <Button onClick={() => setOver(false)}>Restart</Button>
+              <Button onClick={() => setOver(false)}>Play Again</Button>
             </>
         :
           <>
