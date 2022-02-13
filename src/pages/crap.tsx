@@ -65,8 +65,27 @@ const Home: NextPage = () => {
     );
     let orientation;
     if (m) {
-      orientation = !window.screen.orientation.angle ? 'portrait' : 'landscape';
-      setOrientation(orientation)
+      let scren = screen || window;
+      orientation = scren.orientation || window.orientation || screen.orientation || window.screen.orientation;
+      orientation = orientation.angle ? 'portrait' : 'landscape';
+      setOrientation(orientation);
+
+      const mql = window.matchMedia("(orientation: portrait)");
+
+      if(mql.matches) {  
+        setOrientation("portrait");
+      } else {  
+        setOrientation("landscape");
+      }
+
+      mql.addListener(function(m) {
+          if(m.matches) {
+            setOrientation("portrait");
+          }
+          else {
+            setOrientation("landscape");
+          }
+      });
     }
     setMobile(m);
     if (m) {
