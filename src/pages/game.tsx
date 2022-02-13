@@ -109,6 +109,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     return () => window.removeEventListener("mouseup", ab)
   }, [start, over]);
   React.useEffect(() => {
+    console.log(bratio, mobile);
     if ((bratio !== 1 && !mobile) || (bratio !== 1.5 && mobile)) {
       setZoom(true);
     } else {

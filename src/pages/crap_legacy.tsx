@@ -3,19 +3,8 @@ import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
-import {
-  Box,
-  Button,
-  Text,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Flex,
-  Link
-} from '@chakra-ui/react';
+import { Box, Button, Text } from '@chakra-ui/react';
 import Image from 'next/image'
-import NextLink from 'next/link'
 
 interface Vector {
   x: number;
@@ -25,7 +14,6 @@ interface Vector {
 interface IBullet {
   left: number;
   top: number;
-  uuid: number;
 }
 
 interface Invader {
@@ -51,9 +39,6 @@ const Home: NextPage = () => {
   const [over, setOver] = React.useState<boolean>(false);
   const [mobile, setMobile] = React.useState<boolean>(false);
   const [orientation, setOrientation] = React.useState<string>("");
-  const [dmg, setDmg] = React.useState<number>(1);
-  const [bulletSpeed, setBulletSpeed] = React.useState<number>(8.5);
-  const [bulletSpawn, setBulletSpawn] = React.useState<number>(500);
   React.useEffect((): any => {
     const userAgent =
       typeof window.navigator === "undefined" ? "" : navigator.userAgent;
@@ -105,90 +90,53 @@ const Home: NextPage = () => {
         return Math.round((ghostY - 3 * cos_theta) * 100) / 100;
       }
     });
-  }, 1);
+  }, 0.01);
   useInterval(function() {
     let invds = invaders;
-    let newBullets: IBullet[] = bullets.reduce((arr: IBullet[], item: IBullet) => {
-      if (!item) {
-        return arr;
-      }
-      let collision: boolean = false;
-      invds = invds.reduce((ar: Invader[], item2: Invader, ind2) => {
-        if (!item2) {
-          return ar;
+    let newBullets: IBullet[] = bullets.map((item: IBullet) => {
+      let newItem: IBullet = {
+        left: item.left + 5,
+        top: item.top,
+      };
+      return newItem;
+    }).filter((item: IBullet, ind1) => {
+      invds = invds.filter((item2: Invader, ind2) => {
+        if (item2.hp > 1) {
+          return true;
         }
-        const result = checkCollision(document.getElementById(`b_${item.uuid}`), document.getElementById(`i_${ind2}`));
+        const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
         if (result) {
-          collision = true;
-          item2.hp -= dmg;
-          if (item2.hp > 1) {
-            // item2.right += 0.1;
-            ar.push(item2);
-          } else {
-            setCounter(counter+item2.ohp);
-          }
-        } else {
-          // item2.right += 0.1;
-          ar.push(item2);
+          setCounter(counter+item2.ohp);
         }
-        return ar;
-      }, []);
-      if (!collision && !(item.left > window.innerWidth)) {
-        // item.left += 5;
-        arr.push(item);
-      }
-      return arr;
-    }, []).map((item: IBullet) => {
-      item.left += bulletSpeed;
-      return item;
+        return !result;
+      }).map((item2: Invader, ind2) => {
+        const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
+        if (result) {
+          item2.hp -= 1;
+        }
+        return item2;
+      });
+      return !(item.left > window.innerWidth)
     });
-    invds = invds.map((item: Invader) => {
-      if (item.hp > 10) {
-        item.right += 0.1;
-      } else {
-        item.right += 1.1-item.hp/10;
-      }
-      return item;
-    });
-    // let newBullets: IBullet[] = bullets.map((item: IBullet) => {
-    //   let newItem: IBullet = {
-    //     left: item.left + 5,
-    //     top: item.top,
-    //   };
-    //   return newItem;
-    // }).filter((item: IBullet, ind1) => {
-    //   invds = invds.filter((item2: Invader, ind2) => {
-    //     if (item2.hp > 1) {
-    //       return true;
-    //     }
-    //     const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
-    //     if (result) {
-    //       setCounter(counter+item2.ohp);
-    //     }
-    //     return !result;
-    //   }).map((item2: Invader, ind2) => {
-    //     const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
-    //     if (result) {
-    //       item2.hp -= 1;
-    //     }
-    //     return item2;
-    //   });
-    //   return !(item.left > window.innerWidth)
-    // });
-    setInvaders(invds);
+    setInvaders(invds.map((item: Invader) => {
+      let newItem: Invader = {
+        right: item.right + 0.5,
+        top: item.top,
+        hp: item.hp,
+        ohp: item.ohp
+      };
+      return newItem;
+    }));
     setBullets(newBullets);
   }, 5);
   useInterval(function() {
-    setBullets([...bullets, {left: ghostX+50, top: ghostY, uuid: Date.now()}])
-  }, bulletSpawn);
+    setBullets([...bullets, {left: ghostX, top: ghostY}])
+  }, 250);
   useInterval(function() {
     let randY: number = Math.floor(Math.random() * (window.innerHeight-100));
     let randHP: number = Math.ceil(Math.random() * 10);
-    if (Math.random() > 0.9) {
-      randHP = Math.ceil(Math.random() * (100 - 50 + 1) + 50)
-    }
-    setInvaders([...invaders, {right: 0, top: randY, hp: randHP, ohp: randHP }]);
-    setSpawnrate(Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
+    setInvaders([...invaders, {right: 0, top: randY, hp: randHP * 5, ohp: randHP }]);
+    setSpawnrate(Math.floor(Math.random() * (3000 - 100 + 1)) + 100);
   }, spawnRate);
   function checkCollision(elm1: any, elm2: any) {
     if (!elm1 || !elm2) return;
@@ -222,42 +170,7 @@ const Home: NextPage = () => {
             </>
           :
             <>
-              <Flex flexDir="column" justifyContent={"center"} alignItems={"center"}>
-                <Flex justifyContent={"center"} alignItems={"center"}>
-                  <Text marginRight={3}>Points: {counter}</Text>
-                  <Flex flexDir="column" height="inherit" justifyContent={"center"}>
-                    <Slider marginBottom={5} width="50vw" aria-label='slider-ex-1' defaultValue={1} min={1} max={10} step={1} onChange={(v: number) => setDmg(v)}>
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <SliderThumb />
-                    </Slider>
-                    <Slider marginBottom={5} width="50vw" aria-label='slider-ex-1' defaultValue={8.5} min={1} max={10} step={0.5} onChange={(v: number) => setBulletSpeed(v)}>
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <SliderThumb />
-                    </Slider>
-                    <Slider width="50vw" aria-label='slider-ex-1' defaultValue={500} min={100} max={1000} step={1} onChange={(v: number) => setBulletSpawn(v)}>
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <SliderThumb />
-                    </Slider>
-                  </Flex>
-                  <Text marginLeft={3}>
-                    {`Damage: ${dmg}\nSpawnRate: ${spawnRate}ms\nPerformance: Low\nBullet Speed: ${bulletSpeed}\nBullet Spawnrate: ${bulletSpawn}ms`}
-                  </Text>
-                </Flex>
-                <Text>
-                  {"Performance Issues? Contribute to GitHub "}
-                  <NextLink href="https://github.com/NastyPigz/ghostandcakes">
-                    <Link color="blue">
-                      <a>here</a>
-                    </Link>
-                  </NextLink>
-                </Text>
-              </Flex>
+              <p>{counter}</p>
               {/* <img src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} /> */}
               <div ref={player} style={{
                 position: "fixed",
@@ -281,12 +194,13 @@ const Home: NextPage = () => {
                 height: "1vh",
                 width: "1vw",
                 backgroundColor: "purple"
-              }} key={index} id={`b_${i.uuid}`}></div>)}
+              }} key={index} id={`b_${index}`}></div>)}
               {invaders.map((i: Invader, index: number) => <div style={{
                 position: "fixed",
                 top: `${i.top}px`,
                 right: `${i.right}px`,
                 height: "5vh",
+                // height: `${i.hp/5 > 1 ? i.hp/5 : 1}vh`,
                 width: "1.5vw",
                 backgroundColor: "green",
                 textAlign: "center",
@@ -307,4 +221,3 @@ const Home: NextPage = () => {
 }
 
 export default Home
-
