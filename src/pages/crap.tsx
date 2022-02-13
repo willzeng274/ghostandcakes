@@ -4,6 +4,7 @@ import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
 import { linkWithPhoneNumber } from 'firebase/auth'
+import Image from 'next/image'
 
 interface Vector {
   x: number;
@@ -18,6 +19,8 @@ interface IBullet {
 interface Invader {
   right: number;
   top: number;
+  ohp: number;
+  hp: number;
 }
  
 const ghostX = 50;
@@ -26,7 +29,7 @@ const Home: NextPage = () => {
   const dispatch = useDispatch();
   const player = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
-  // const [ghostX, setGhostX] = React.useState<number>(50);
+  const [spawnRate, setSpawnrate] = React.useState<number>(2000);
   const [ghostY, setGhostY] = React.useState<number>(10);
   const [CX, setCX] = React.useState<number>(0);
   const [CY, setCY] = React.useState<number>(0);
@@ -97,12 +100,21 @@ const Home: NextPage = () => {
       };
       return newItem;
     }).filter((item: IBullet, ind1) => {
-      invds = invds.filter((_, ind2) => {
+      invds = invds.filter((item2: Invader, ind2) => {
+        if (item2.hp > 1) {
+          return true;
+        }
         const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
         if (result) {
-          setCounter(counter+1);
+          setCounter(counter+item2.ohp);
         }
         return !result;
+      }).map((item2: Invader, ind2) => {
+        const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
+        if (result) {
+          item2.hp -= 1;
+        }
+        return item2;
       });
       return !(item.left > window.innerWidth)
     });
@@ -110,6 +122,8 @@ const Home: NextPage = () => {
       let newItem: Invader = {
         right: item.right + 0.5,
         top: item.top,
+        hp: item.hp,
+        ohp: item.ohp
       };
       return newItem;
     }));
@@ -120,8 +134,10 @@ const Home: NextPage = () => {
   }, 250);
   useInterval(function() {
     let randY: number = Math.floor(Math.random() * (window.innerHeight-100));
-    setInvaders([...invaders, {right: 0, top: randY}])
-  }, 2000);
+    let randHP: number = Math.ceil(Math.random() * 10);
+    setInvaders([...invaders, {right: 0, top: randY, hp: randHP * 5, ohp: randHP }]);
+    setSpawnrate(Math.floor(Math.random() * (3000 - 100 + 1)) + 100);
+  }, spawnRate);
   function checkCollision(elm1: any, elm2: any) {
     if (!elm1 || !elm2) return;
     const elm1Rect = elm1.getBoundingClientRect();
@@ -156,13 +172,27 @@ const Home: NextPage = () => {
             <>
               <p>{counter}</p>
               {/* <img src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} /> */}
-              <img ref={player} alt="" src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY-25}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
+              <div ref={player} style={{
+                position: "fixed",
+                top: `${ghostY-25}px`,
+                left: `${ghostX}px`,
+                transform: `rotate(${rotate}deg)`,
+              }}>
+                <div style={{
+                  position: "relative",
+                  width: "7.5vw",
+                  height: "7.5vw"
+                }}>
+                  <Image alt="" src="/ghost.png" layout="fill" objectFit="contain" />
+                </div>
+              </div>
+              {/* <img ref={player} alt="" src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY-25}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} /> */}
               {bullets.map((i: IBullet, index: number) => <div style={{
                 position: "fixed",
                 top: `${i.top}px`,
                 left: `${i.left}px`,
-                height: "2vh",
-                width: "3vw",
+                height: "1vh",
+                width: "1vw",
                 backgroundColor: "purple"
               }} key={index} id={`b_${index}`}></div>)}
               {invaders.map((i: Invader, index: number) => <div style={{
@@ -170,7 +200,7 @@ const Home: NextPage = () => {
                 top: `${i.top}px`,
                 right: `${i.right}px`,
                 height: "5vh",
-                width: "2vw",
+                width: "1vw",
                 backgroundColor: "green"
               }} key={index} id={`i_${index}`}></div>)}
             </>

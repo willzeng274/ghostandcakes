@@ -6,7 +6,6 @@ import 'firebase/compat/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { useInterval } from '../helpers/useInterval';
 
 const clientCredentials = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -28,7 +27,7 @@ function App() {
   const [user]: any[] = useAuthState(auth);
   const [allowed, setAllowed] = useState<boolean>(false);
   const [requested, setRequested] = useState<boolean>(false);
-  useInterval(() => {
+  useEffect(() => {
     (async () => {
       if (user?.uid) {
         const messagesRef = firestore.collection('messages');
@@ -42,7 +41,7 @@ function App() {
         })
       }
     })()
-  }, 1);
+  });
   function allowEmail(email: string): any {
     fetch("/api/email", {
       method: "POST",
