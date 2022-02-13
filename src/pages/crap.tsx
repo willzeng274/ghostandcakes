@@ -66,9 +66,11 @@ const Home: NextPage = () => {
     let orientation;
     if (m) {
       let scren = screen || window;
-      orientation = scren.orientation || window.orientation || screen.orientation || window.screen.orientation;
-      orientation = orientation.angle ? 'portrait' : 'landscape';
-      setOrientation(orientation);
+      orientation = scren?.orientation || window?.screen?.orientation;
+      if (orientation) {
+        orientation = orientation.angle ? 'portrait' : 'landscape';
+        setOrientation(orientation);
+      }
 
       const mql = window.matchMedia("(orientation: portrait)");
 
