@@ -6,7 +6,7 @@ import 'firebase/compat/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { Button, Input, Text, Flex } from '@chakra-ui/react';
+import { Button, Input, Text } from '@chakra-ui/react';
 
 const clientCredentials = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
