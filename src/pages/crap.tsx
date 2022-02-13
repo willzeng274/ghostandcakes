@@ -41,7 +41,8 @@ const Home: NextPage = () => {
   const dispatch = useDispatch();
   const player = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
-  const [spawnRate, setSpawnrate] = React.useState<number>(2000);
+  const [spawnRate, setSpawnrate] = React.useState<number>(0);
+  const [spawnRateDefault, setSpawnrateDefault] = React.useState<number>(2000);
   const [ghostY, setGhostY] = React.useState<number>(10);
   const [CX, setCX] = React.useState<number>(0);
   const [CY, setCY] = React.useState<number>(0);
@@ -182,14 +183,17 @@ const Home: NextPage = () => {
     setBullets([...bullets, {left: ghostX+50, top: ghostY, uuid: Date.now()}])
   }, bulletSpawn);
   useInterval(function() {
+    if (spawnRate === 5001) return;
     let randY: number = Math.floor(Math.random() * (window.innerHeight-100));
     let randHP: number = Math.ceil(Math.random() * 10);
     if (Math.random() > 0.9) {
       randHP = Math.ceil(Math.random() * (100 - 50 + 1) + 50)
     }
     setInvaders([...invaders, {right: 0, top: randY, hp: randHP, ohp: randHP }]);
-    setSpawnrate(Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
-  }, spawnRate);
+    if (spawnRate === 0) {
+      setSpawnrateDefault(Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
+    }
+  }, spawnRate === 0 ? spawnRateDefault : spawnRate);
   function checkCollision(elm1: any, elm2: any) {
     if (!elm1 || !elm2) return;
     const elm1Rect = elm1.getBoundingClientRect();
@@ -232,6 +236,12 @@ const Home: NextPage = () => {
                       </SliderTrack>
                       <SliderThumb />
                     </Slider>
+                    <Slider marginBottom={5} width="50vw" aria-label='slider-ex-1' defaultValue={2000} min={250} max={5001} step={1} onChange={(v: number) => setSpawnrate(v)}>
+                      <SliderTrack>
+                        <SliderFilledTrack />
+                      </SliderTrack>
+                      <SliderThumb />
+                    </Slider>
                     <Slider marginBottom={5} width="50vw" aria-label='slider-ex-1' defaultValue={8.5} min={1} max={10} step={0.5} onChange={(v: number) => setBulletSpeed(v)}>
                       <SliderTrack>
                         <SliderFilledTrack />
@@ -246,7 +256,7 @@ const Home: NextPage = () => {
                     </Slider>
                   </Flex>
                   <Text marginLeft={3}>
-                    {`Damage: ${dmg}\nSpawnRate: ${spawnRate}ms\nPerformance: Low\nBullet Speed: ${bulletSpeed}\nBullet Spawnrate: ${bulletSpawn}ms`}
+                    {`Damage: ${dmg}\nSpawnRate: ${spawnRate === 0 ? spawnRateDefault : spawnRate === 5001 ? "NEVER" : spawnRate}ms ${spawnRate === 0 ? "DEFAULT" : ""}\nPerformance: Low\nBullet Speed: ${bulletSpeed}\nBullet Spawnrate: ${bulletSpawn}ms`}
                   </Text>
                 </Flex>
                 <Text>
@@ -280,7 +290,8 @@ const Home: NextPage = () => {
                 left: `${i.left}px`,
                 height: "1vh",
                 width: "1vw",
-                backgroundColor: "purple"
+                backgroundColor: "purple",
+                borderRadius: "50%"
               }} key={index} id={`b_${i.uuid}`}></div>)}
               {invaders.map((i: Invader, index: number) => <div style={{
                 position: "fixed",

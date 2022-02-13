@@ -5,7 +5,7 @@ import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
 import { Fetch } from '../helpers/deta'
 import { Button } from '@chakra-ui/react'
-// import useDeviceDetect from '../helpers/device'
+import useEventListener from '../helpers/listener'
 
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const dispatch = useDispatch();
@@ -36,7 +36,26 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.font = "30px Arial";
     ctx.fillText("Points: " + String(counter), 0, 25);
   }, [counter, start, over, zoom]);
-  React.useEffect((): any => {
+  useEventListener("mousemove", (e: any) => {
+    if (localStorage.getItem('banned') === '1') {
+      alert("You are banned from the game");
+      window.location.href = "/";
+      return;
+    }
+    const userAgent =
+      typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    const isMobile = Boolean(
+      userAgent.match(
+        /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
+      )
+    );
+    if (isMobile && (e?.target as any)?.classList[0] !== "no-drag") {
+      return;
+    }
+    setCX(e.clientX);
+    setCY(e.clientY);
+  });
+  React.useEffect((): void => {
     const userAgent =
       typeof window.navigator === "undefined" ? "" : navigator.userAgent;
     setMobile(Boolean(
@@ -44,27 +63,9 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
         /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
       )
     ));
-    const abc: any = window.addEventListener("mousemove", (e) => {
-      if (localStorage.getItem('banned') === '1') {
-        alert("You are banned from the game");
-        window.location.href = "/";
-        return;
-      }
-      const userAgent =
-        typeof window.navigator === "undefined" ? "" : navigator.userAgent;
-      const isMobile = Boolean(
-        userAgent.match(
-          /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
-        )
-      );
-      if (isMobile && (e?.target as any)?.classList[0] !== "no-drag") {
-        return;
-      }
-      setCX(e.clientX);
-      setCY(e.clientY);
-    });
+  }, [mobile]);
+  React.useEffect((): void => {
     console.log("LEADERBOARD: ", items);
-    return () => window.removeEventListener("mouseover", abc);
   }, [items]);
   React.useEffect(() => {
     if (!localStorage.getItem("lb")) {
@@ -78,36 +79,29 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       localStorage.setItem("lb", String(lb))
     }
   }, [lb])
+  useEventListener("keyup", () => {
+    if (over) {
+      setOver(false);
+    }
+  });
   React.useEffect(() => {
-    const ab: any = window.addEventListener("keyup", () => {
-      if (over) {
-        setOver(false);
-      }
-    });
     if (!over) {
       setCounter(0);
     }
-    return () => window.removeEventListener("keyup", ab);
   }, [over]);
-  React.useEffect(() => {
-    const ab: any = window.addEventListener("keyup", () => {
-      if (!start) {
-        setStart(true);
-      }
-    });
-    return () => window.removeEventListener("keyup", ab);
-  }, [start]);
-  React.useEffect(() => {
-    const ab: any = window.addEventListener("mouseup", () => {
-      if (!start) {
-        setStart(true);
-      }
-      if (over) {
-        setOver(false);
-      }
-    });
-    return () => window.removeEventListener("mouseup", ab)
-  }, [start, over]);
+  useEventListener("keyup", () => {
+    if (!start) {
+      setStart(true);
+    }
+  });
+  useEventListener("mouseup", () => {
+    if (!start) {
+      setStart(true);
+    }
+    if (over) {
+      setOver(false);
+    }
+  });
   React.useEffect(() => {
     console.log(bratio, mobile);
     if ((bratio !== 1 && !mobile) || (bratio !== 1.5 && mobile)) {
