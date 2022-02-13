@@ -6,6 +6,7 @@ import 'firebase/compat/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { Button, Input, Text, Flex } from '@chakra-ui/react';
 
 const clientCredentials = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -93,8 +94,8 @@ function SignIn() {
 
   return (
     <>
-      <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
-      <p>Be polite! If you&apos;re reported you can get banned.</p>
+      <Button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</Button>
+      <Text>Be polite! If you&apos;re reported you can get banned.</Text>
     </>
   )
 
@@ -109,7 +110,7 @@ function SignOut() {
     }
   }, [clicked])
   return auth.currentUser && (
-    <button className="sign-out" onClick={() => setClicked(true)}>Sign Out</button>
+    <Button className="sign-out" onClick={() => setClicked(true)}>Sign Out</Button>
   )
 }
 
@@ -168,7 +169,7 @@ function ChatRoom() {
   }
 
   return (<>
-    <main style={{height: "90vh", width: "100%", overflowY: "scroll"}}>
+    <main style={{height: "85vh", width: "100%", overflowY: "scroll"}}>
 
       {messages && messages.map((msg: any, index: any) => <ChatMessage key={index} message={msg} delet={deleteMessage} edit={editMessage} />)}
 
@@ -178,9 +179,9 @@ function ChatRoom() {
 
     <form onSubmit={sendMessage}>
 
-      <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
+      <Input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
 
-      <button type="submit" disabled={!formValue}>Send🕊️</button>
+      <Button type="submit" disabled={!formValue}>Send🕊️</Button>
 
     </form>
   </>)
@@ -197,8 +198,8 @@ function ChatMessage(props: any) {
     <div className={`message ${messageClass}`}>
       <b>{displayName}</b>
       <p>{text}</p>
-      <button onClick={(e: any) => delet(e, id, uid)}>Delete</button>
-      <button onClick={(e: any) => edit(e, id, uid)}>Edit</button>
+      <Button onClick={(e: any) => delet(e, id, uid)} marginRight={1}>Delete</Button>
+      <Button onClick={(e: any) => edit(e, id, uid)}>Edit</Button>
     </div>
   )
 }

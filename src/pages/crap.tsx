@@ -3,7 +3,7 @@ import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
-import { linkWithPhoneNumber } from 'firebase/auth'
+import { Box, Button, Text } from '@chakra-ui/react';
 import Image from 'next/image'
 
 interface Vector {
@@ -158,7 +158,7 @@ const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>SPACE INVADERS</title>
+        <title>CAKE INVADERS</title>
         <meta name="description" content="Ghost and Cakes - a game made with $13 billion budget" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -183,7 +183,7 @@ const Home: NextPage = () => {
                   width: "7.5vw",
                   height: "7.5vw"
                 }}>
-                  <Image alt="" src="/ghost.png" layout="fill" objectFit="contain" />
+                  <Image alt="" src="/ghost.png" layout="fill" objectFit="contain" priority={true} />
                 </div>
               </div>
               {/* <img ref={player} alt="" src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY-25}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} /> */}
@@ -200,14 +200,21 @@ const Home: NextPage = () => {
                 top: `${i.top}px`,
                 right: `${i.right}px`,
                 height: "5vh",
-                width: "1vw",
-                backgroundColor: "green"
-              }} key={index} id={`i_${index}`}></div>)}
+                // height: `${i.hp/5 > 1 ? i.hp/5 : 1}vh`,
+                width: "1.5vw",
+                backgroundColor: "green",
+                textAlign: "center",
+                color: "white",
+                lineHeight: "5vh"
+              }} key={index} id={`i_${index}`}>{i.hp}</div>)}
             </>
         :
-          <>
-            {"Game Over!"}
-          </>
+          <Box>
+            <Text>{"Game Over!"}</Text>
+            <Button onClick={() => setOver(false)}>
+              <Text>Restart</Text>
+            </Button>
+          </Box>
       }
     </div>
   )

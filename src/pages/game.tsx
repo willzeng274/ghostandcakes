@@ -4,6 +4,7 @@ import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
 import { Fetch } from '../helpers/deta'
+import { Button } from '@chakra-ui/react'
 // import useDeviceDetect from '../helpers/device'
 
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -83,6 +84,9 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
         setOver(false);
       }
     });
+    if (!over) {
+      setCounter(0);
+    }
     return () => window.removeEventListener("keyup", ab);
   }, [over]);
   React.useEffect(() => {
@@ -175,7 +179,6 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       //   })
       // }).then((res) => res.json()).then((res) => console.log(res))
     }
-    setCounter(0);
     setOver(true);
   }
   function between(x: number, min: number, max: number): boolean {
@@ -201,9 +204,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       return;
     }
     cakeRandom();
-    setCounter(counter => {
-      return counter + 1;
-    });
+    setCounter(counter+1);
   }
   return (
     <div>
@@ -255,13 +256,14 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
           :
             <>
               <p>Game Over!</p>
+              <p>Score: {counter}</p>
               <p>Personal Best: {lb}</p>
               <p>Note: This is information is stored in your browser.</p>
-              <button onClick={() => setOver(false)}>Restart</button>
+              <Button onClick={() => setOver(false)}>Restart</Button>
             </>
         :
           <>
-            <button onClick={() => setStart(true)}>Start Game</button>
+            <Button onClick={() => setStart(true)}>Start Game</Button>
             <p>Game: You must click the cakes to gain points, and avoid your mouse being touched by the ghost!</p>
           </>
       }

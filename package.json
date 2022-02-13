@@ -8,10 +8,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^1.8.3",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
     "@reduxjs/toolkit": "^1.7.2",
     "axios": "^0.25.0",
     "deta": "^1.0.1",
     "firebase": "^9.6.6",
+    "framer-motion": "^6.2.6",
     "next": "12.0.7",
     "pusher": "^5.0.1",
     "pusher-js": "^7.0.6",
