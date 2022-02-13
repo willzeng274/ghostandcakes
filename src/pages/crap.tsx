@@ -122,20 +122,17 @@ const Home: NextPage = () => {
         if (result) {
           collision = true;
           item2.hp -= dmg;
-          if (item2.hp > 1) {
-            // item2.right += 0.1;
+          if (item2.hp >= 1) {
             ar.push(item2);
           } else {
             setCounter(counter+item2.ohp);
           }
         } else {
-          // item2.right += 0.1;
           ar.push(item2);
         }
         return ar;
       }, []);
       if (!collision && !(item.left > window.innerWidth)) {
-        // item.left += 5;
         arr.push(item);
       }
       return arr;
@@ -151,31 +148,6 @@ const Home: NextPage = () => {
       }
       return item;
     });
-    // let newBullets: IBullet[] = bullets.map((item: IBullet) => {
-    //   let newItem: IBullet = {
-    //     left: item.left + 5,
-    //     top: item.top,
-    //   };
-    //   return newItem;
-    // }).filter((item: IBullet, ind1) => {
-    //   invds = invds.filter((item2: Invader, ind2) => {
-    //     if (item2.hp > 1) {
-    //       return true;
-    //     }
-    //     const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
-    //     if (result) {
-    //       setCounter(counter+item2.ohp);
-    //     }
-    //     return !result;
-    //   }).map((item2: Invader, ind2) => {
-    //     const result = checkCollision(document.getElementById(`b_${ind1}`), document.getElementById(`i_${ind2}`));
-    //     if (result) {
-    //       item2.hp -= 1;
-    //     }
-    //     return item2;
-    //   });
-    //   return !(item.left > window.innerWidth)
-    // });
     setInvaders(invds);
     setBullets(newBullets);
   }, 5);
@@ -261,7 +233,7 @@ const Home: NextPage = () => {
                 </Flex>
                 <Text>
                   {"Performance Issues? Contribute to GitHub "}
-                  <NextLink href="https://github.com/NastyPigz/ghostandcakes">
+                  <NextLink href="https://github.com/NastyPigz/ghostandcakes" passHref>
                     <Link color="blue">
                       <a>here</a>
                     </Link>

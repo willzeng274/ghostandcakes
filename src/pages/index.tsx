@@ -14,28 +14,28 @@ const Home: NextPage = () => {
             </Head>
             <p>Imagine coming to this website</p>
             <br />
-            <NextLink href="/game">
+            <NextLink href="/game" passHref>
                 <Link color="blue">
                     <a>Play Ghost and Cakes</a>
                 </Link>
             </NextLink>
             <br />
             <br />
-            <NextLink href="/free">
+            <NextLink href="/free" passHref>
                 <Link color="blue">
                     <a>Play Lower Budget version of Ghost and Cakes</a>
                 </Link>
             </NextLink>
             <br />
             <br />
-            <NextLink href="/crap">
+            <NextLink href="/crap" passHref>
                 <Link color="blue">
                     <a>Play Cake Invaders - A game caused by a miscalculation in Ghost and Cakes</a>
                 </Link>
             </NextLink>
             <br />
             <br />
-            <NextLink href="/chat">
+            <NextLink href="/chat" passHref>
                 <Link color="blue">
                     <a>Global chat in case you can&apos;t talk</a>
                 </Link>
