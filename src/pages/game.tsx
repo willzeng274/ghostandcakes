@@ -120,7 +120,12 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
   useInterval(function() {
-    const brio: number = Math.round(window.devicePixelRatio * 100) / 200;
+    let isRetina = false;
+    if (window.matchMedia) {
+      var mq = window.matchMedia("only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen  and (min-device-pixel-ratio: 1.3), only screen and (min-resolution: 1.3dppx)");
+      isRetina = (mq && mq.matches || (window.devicePixelRatio > 1)); 
+    }
+    const brio: number = Math.round(window.devicePixelRatio * 100) / (isRetina ? 200 : 100);
     if (bratio !== brio) {
       setBratio(brio);
     }
