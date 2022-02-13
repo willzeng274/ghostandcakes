@@ -218,7 +218,7 @@ const Home: NextPage = () => {
               Please rotate your phone then refresh the webpage. This game works terrible in portrait mode.
             </>
           :
-            <>
+            <Box overflow="hidden">
               <Flex flexDir="column" justifyContent={"center"} alignItems={"center"}>
                 <Flex justifyContent={"center"} alignItems={"center"}>
                   <Text marginRight={3}>Points: {counter}</Text>
@@ -297,7 +297,7 @@ const Home: NextPage = () => {
                 color: "white",
                 lineHeight: "5vh"
               }} key={index} id={`i_${index}`}>{i.hp}</div>)}
-            </>
+            </Box>
         :
           <Box>
             <Text>{"Game Over!"}</Text>
