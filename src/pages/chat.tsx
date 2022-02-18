@@ -154,24 +154,10 @@ function ChatRoom() {
     await messagesRef.doc(id).delete()
   }
 
-  async function editMessage(e: any, id: any, uid: any) {
-    e.preventDefault();
-    if (uid != auth.currentUser.uid) {
-      return;
-    }
-    if (formValue.trim().length < 1) {
-      return;
-    }
-    await messagesRef.doc(id).update({
-      text: formValue.trim()
-    })
-    setFormValue("");
-  }
-
   return (<>
     <main style={{height: "85vh", width: "100%", overflowY: "scroll"}}>
 
-      {messages && messages.map((msg: any, index: any) => <ChatMessage key={index} message={msg} delet={deleteMessage} edit={editMessage} />)}
+      {messages && messages.map((msg: any, index: any) => <ChatMessage key={index} message={msg} delet={deleteMessage} mRef={messagesRef} />)}
 
       <span ref={dummy}></span>
 
@@ -190,16 +176,44 @@ function ChatRoom() {
 
 function ChatMessage(props: any) {
   const { text, uid, displayName, id }: any = props.message;
-  const { delet, edit } = props;
+  const { delet, mRef: messagesRef } = props;
+  const [formValue, setFormValue] = React.useState<string>("");
+  const [editing, setEditing] = useState<boolean>(false);
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+
+  
+  async function editMessage(e: any, id: any, uid: any) {
+    e.preventDefault();
+    if (uid != auth.currentUser.uid) {
+      return;
+    }
+    if (formValue.trim().length < 1) {
+      return;
+    }
+    await messagesRef.doc(id).update({
+      text: formValue.trim()
+    })
+    setEditing(false);
+    setFormValue("");
+  }
 
   return (
     <div className={`message ${messageClass}`}>
       <b>{displayName}</b>
-      <p>{text}</p>
+      {
+        editing ?
+          <>
+            <form onSubmit={(e) => editMessage(e, id, uid)}>
+            <Input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
+            <Button type="submit" disabled={!formValue}>Edit</Button>
+            </form>
+          </>
+        :
+          <p>{text}</p>
+      }
       <Button onClick={(e: any) => delet(e, id, uid)} marginRight={1}>Delete</Button>
-      <Button onClick={(e: any) => edit(e, id, uid)}>Edit</Button>
+      <Button onClick={_ => setEditing(true)}>Edit</Button>
     </div>
   )
 }

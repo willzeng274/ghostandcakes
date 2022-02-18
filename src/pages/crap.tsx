@@ -91,8 +91,8 @@ const Home: NextPage = () => {
     }
     setMobile(m);
     if (m) {
-      const abc: any = window.addEventListener("touchmove", (e) => {setCX(e.touches[0].clientX); setCY(e.touches[0].clientY);});
-      return () => window.removeEventListener("touchmove", abc);
+      const abc: any = window.addEventListener("touchstart", (e) => {setCX(e.touches[0].clientX); setCY(e.touches[0].clientY);});
+      return () => window.removeEventListener("touchstart", abc);
     } else {
       const abc: any = window.addEventListener("mousemove", (e) => {setCX(e.clientX); setCY(e.clientY);});
       return () => window.removeEventListener('mousemove', abc);
@@ -291,11 +291,13 @@ const Home: NextPage = () => {
                 top: `${i.top}px`,
                 right: `${i.right}px`,
                 height: "5vh",
-                width: "1.5vw",
+                width: "auto",
                 backgroundColor: "green",
                 textAlign: "center",
                 color: "white",
-                lineHeight: "5vh"
+                lineHeight: "5vh",
+                paddingLeft: "0.5vw",
+                paddingRight: "0.5vw"
               }} key={index} id={`i_${index}`}>{i.hp}</div>)}
             </Box>
         :
@@ -311,4 +313,3 @@ const Home: NextPage = () => {
 }
 
 export default Home
-
