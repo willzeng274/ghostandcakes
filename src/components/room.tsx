@@ -26,7 +26,7 @@ export default function ChatRoom() {
     const [socket, setSocket] = useState<Socket>();
     useEffect((): any => {
         const newSocket = io(process.env.NODE_ENV === "development" ? "ws://localhost:3000/" : "wss://gnc-backend-production.up.railway.app//", {
-            path: "/api/ws/"
+            path: process.env.NODE_ENV === "development" ? "/api/ws/" : "/socket.io/"
         });
         newSocket.on("connect", () => setConnected(true));
         setSocket(newSocket)
