@@ -11,7 +11,6 @@ const MessageInput = ({ socket }: { socket: Socket | undefined }) => {
         setValue('');
       }
     };
-    // <Button type="submit" disabled={!formValue}>Send🕊️</Button>
     return (
       <form onSubmit={submitForm}>
         <Input
