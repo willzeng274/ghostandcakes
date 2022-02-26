@@ -25,9 +25,10 @@ export default function ChatRoom() {
     const [connected, setConnected] = useState<boolean>(false);
     const [socket, setSocket] = useState<Socket>();
     useEffect((): any => {
-        const newSocket = io(process.env.NODE_ENV === "development" ? "ws://localhost:3000/" : "wss://gnc-backend-production.up.railway.app//", {
-            path: process.env.NODE_ENV === "development" ? "/api/ws/" : "/socket.io/"
-        });
+        const newSocket = io("wss://gnc-backend-production.up.railway.app");
+        // const newSocket = io(process.env.NODE_ENV === "development" ? "ws://localhost:3000/" : "wss://gnc-backend-production.up.railway.app//", {
+        //     path: process.env.NODE_ENV === "development" ? "/api/ws/" : "/socket.io/"
+        // });
         newSocket.on("connect", () => setConnected(true));
         setSocket(newSocket)
         return () => newSocket.close();
