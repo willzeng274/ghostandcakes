@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@chakra-ui/react';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import ChatRoom from '../components/room';
 import { useAppDispatch } from '../reducers/settings';
@@ -23,15 +23,17 @@ export const auth = getAuth();
 
 export default function Component() {
   const dispatch = useAppDispatch();
-  const [signedIn, setSignedIn] = useState<boolean>(false);
+  const [user, setUser] = React.useState<any>();
   function getSignIn() {
     signInWithPopup(auth, provider)
       .then((result: any) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential?.accessToken;
-        const user = result.user;
+        if (credential?.idToken) {
+          localStorage.setItem("idToken", credential?.idToken);
+        }
+        setUser(result.user);
         dispatch(setToken(token));
-        setSignedIn(true);
       }).catch((error: any) => {
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -39,10 +41,31 @@ export default function Component() {
         const credential = GoogleAuthProvider.credentialFromError(error);
       });
   }
+  useEffect(() => {
+    const idToken = localStorage.getItem("idToken");
+    if (!idToken) return;
+    const credential = GoogleAuthProvider.credential(idToken);
+    signInWithCredential(auth, credential)
+      .then((result: any) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+        if (credential?.idToken) {
+          localStorage.setItem("idToken", credential?.idToken);
+        }
+        const user = result.user;
+        setUser(user);
+        dispatch(setToken(token));
+      }).catch((error: any) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+      });
+  }, []);
   return (
     <>
       {
-        signedIn ? (
+        auth.currentUser ? (
           <ChatRoom />
         ) : (
           <Button onClick={getSignIn}>Sign In</Button>

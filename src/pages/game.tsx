@@ -104,11 +104,13 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   });
   React.useEffect(() => {
     console.log(bratio, mobile);
-    if ((bratio !== 1 && !mobile || bratio !== 0.94 && !mobile) || (bratio !== 1.5 && mobile)) {
-      setZoom(true);
-    } else {
-      setZoom(false);
-    }
+    // Zoom Level Detection is stupid...
+    setZoom(false);
+    // if ((bratio !== 1 && !mobile || bratio !== 0.94 && !mobile) || (bratio !== 1.5 && mobile)) {
+    //   setZoom(true);
+    // } else {
+    //   setZoom(false);
+    // }
   }, [bratio, mobile]);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));

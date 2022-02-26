@@ -12,6 +12,7 @@ function SignOut() {
     useEffect(() => {
       if (clicked) {
         signOut(auth);
+        localStorage.removeItem("idToken");
         window.location.href = "/";
       }
     }, [clicked])
@@ -25,11 +26,27 @@ export default function ChatRoom() {
     const [connected, setConnected] = useState<boolean>(false);
     const [socket, setSocket] = useState<Socket>();
     useEffect((): any => {
-        const newSocket = io("wss://gnc-backend-production.up.railway.app");
-        // const newSocket = io(process.env.NODE_ENV === "development" ? "ws://localhost:3000/" : "wss://gnc-backend-production.up.railway.app//", {
-        //     path: process.env.NODE_ENV === "development" ? "/api/ws/" : "/socket.io/"
-        // });
-        newSocket.on("connect", () => setConnected(true));
+        let newSocket: Socket;
+        switch (process.env.NODE_ENV) {
+            case "development":
+                newSocket = io("ws://localhost:3000/", {
+                    path: "/api/ws/",
+                    auth: {
+                        token: process.env.NEXT_PUBLIC_SOCKET_TOKEN
+                    }
+                })
+                break;
+            default:
+                newSocket = io("wss://gnc-backend-production.up.railway.app", {
+                    auth: {
+                        token: process.env.NEXT_PUBLIC_SOCKET_TOKEN
+                    }
+                });
+                break;
+        }
+        newSocket.on("connect", () => {
+            setConnected(true);
+        });
         setSocket(newSocket)
         return () => newSocket.close();
     }, []);
@@ -38,7 +55,7 @@ export default function ChatRoom() {
             {
                 connected ? (
                     <Box>
-                        <Button onClick={SignOut}>Sign Out</Button>
+                        <SignOut />
                         {/* <Text>{token}{"\n"}{JSON.stringify(auth.currentUser)}</Text> */}
                         <Messages socket={socket} />
                         <MessageInput socket={socket} />
