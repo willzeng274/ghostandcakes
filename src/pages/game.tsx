@@ -20,14 +20,28 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [cakeY, setCakeY] = React.useState<number>(0);
   const [counter, setCounter] = React.useState<number>(0);
   const [speed, setSpeed] = React.useState<number>(0.5);
-  const [bratio, setBratio] = React.useState<number>(1);
   const [mobile, setMobile] = React.useState<boolean>(false);
   const [start, setStart] = React.useState<boolean>(false);
   const [over, setOver] = React.useState<boolean>(false);
   const [lb, setLb] = React.useState<number>(0);
-  const [zoom, setZoom] = React.useState<boolean>(false);
+  function getViewport() {
+    var viewPortWidth;
+    var viewPortHeight;
+    if (typeof window.innerWidth != 'undefined') {
+      viewPortWidth = window.innerWidth,
+      viewPortHeight = window.innerHeight
+    } else if (typeof document.documentElement != 'undefined' && typeof document.documentElement.clientWidth != 'undefined' && document.documentElement.clientWidth != 0) {
+       viewPortWidth = document.documentElement.clientWidth,
+       viewPortHeight = document.documentElement.clientHeight
+    }
+    else {
+      viewPortWidth = document.getElementsByTagName('body')[0].clientWidth,
+      viewPortHeight = document.getElementsByTagName('body')[0].clientHeight
+    }
+    return [viewPortWidth, viewPortHeight];
+  }
   React.useEffect((): void => {
-    if (!start || over || zoom) {
+    if (!start || over) {
       return;
     }
     const canv: any = MyRef.current;
@@ -35,7 +49,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.font = "30px Arial";
     ctx.fillText("Points: " + String(counter), 0, 25);
-  }, [counter, start, over, zoom]);
+  }, [counter, start, over]);
   useEventListener("mousemove", (e: any) => {
     if (localStorage.getItem('banned') === '1') {
       alert("You are banned from the game");
@@ -102,34 +116,17 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       setOver(false);
     }
   });
-  React.useEffect(() => {
-    console.log(bratio, mobile);
-    // Zoom Level Detection is stupid...
-    setZoom(false);
-    // if ((bratio !== 1 && !mobile || bratio !== 0.94 && !mobile) || (bratio !== 1.5 && mobile)) {
-    //   setZoom(true);
-    // } else {
-    //   setZoom(false);
-    // }
-  }, [bratio, mobile]);
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
   useInterval(function() {
-    let isRetina = false;
-    if (window.matchMedia) {
-      var mq = window.matchMedia("only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen  and (min-device-pixel-ratio: 1.3), only screen and (min-resolution: 1.3dppx)");
-      isRetina = (mq && mq.matches || (window.devicePixelRatio > 1)); 
-    }
-    const brio: number = Math.round(window.devicePixelRatio * 100) / (isRetina ? 200 : 100);
-    if (bratio !== brio) {
-      setBratio(brio);
-    }
+    if (over || !start) return;
+    const [w, h] = getViewport();
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
     const a: number = CX - ghostX - 50, b: number = CY-ghostY - 40, c: number = Math.sqrt(a**2 + b**2);
-    const sped: number = mobile ? speed * 1.5 : speed;
+    const sped: number = speed*(mobile ? 1 : Math.min(w/1538.1, h/806.1));
     const ratio: number = (sped)/c, a1: number = a*ratio, b1 : number = b*ratio;
     setGhostX((ghostX: number) => {
       return ghostX + a1;
@@ -218,43 +215,38 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       {
         start ? 
           !over ?
-            !zoom ?
-              <>
-                <canvas ref={MyRef} />
-                <img
-                  ref={CakeRef}
-                  className={"no-drag"}
-                  onClick={handleCakeClick}
-                  src="/cake-a.svg"
-                  alt=""
-                  style={
-                    {
-                      position: "fixed",
-                      top: `${cakeY}px`,
-                      left: `${cakeX}px`,
-                      width: mobile ? "30vw" : "10vw",
-                      height: "auto",
-                    }
-                  }
-                />
-                <img
-                  alt=""
-                  onMouseOver={handleMouseOver}
-                  src="/ghost.png" width={100} height={100}
-                  style={{
+            <>
+              <canvas ref={MyRef} />
+              <img
+                ref={CakeRef}
+                className={"no-drag"}
+                onClick={handleCakeClick}
+                src="/cake-a.svg"
+                alt=""
+                style={
+                  {
                     position: "fixed",
-                    top: `${ghostY}px`,
-                    left: `${ghostX}px`,
-                    transform: `rotate(${rotate}deg)`,
-                    width: mobile ? "30vw" :"10vw",
-                    height: "auto"
-                  }}
-                />
-              </>
-            :
-              <>
-                {"Please update your zoom level. This game cannot be played when zoomed in or out."}
-              </>
+                    top: `${cakeY}px`,
+                    left: `${cakeX}px`,
+                    width: mobile ? "30vw" : "10vw",
+                    height: "auto",
+                  }
+                }
+              />
+              <img
+                alt=""
+                onMouseOver={handleMouseOver}
+                src="/ghost.png" width={100} height={100}
+                style={{
+                  position: "fixed",
+                  top: `${ghostY}px`,
+                  left: `${ghostX}px`,
+                  transform: `rotate(${rotate}deg)`,
+                  width: mobile ? "30vw" :"10vw",
+                  height: "auto"
+                }}
+              />
+            </>
           :
             <>
               <p>Game Over!</p>

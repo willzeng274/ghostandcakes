@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Input } from '@chakra-ui/react';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import ChatRoom from '../components/room';
