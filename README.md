@@ -1,14 +1,24 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
+```
+Database: Deta Base SDK ( migrating to PlanetScale MySQL ), Deta Drive File Storage
+Static Site Host: Vercel
+API Host: Vercel Serverless Functions ( AWS Lambda )
+WS Host: Railway
+WS Server Framework: Express.js ( switching to either net/http & Gorilla or Actix-web & actors )
+Budget: $0, not looking for funding
+Auth: Firebase Google Authentication + NextAuth
+```
 ## Making contributions / debug
 
 First, clone repo and install all dependencies.
 `git clone <repo_url>.git <name>`
 then
 `npm install`
-If you would like to use yarn, remove `package-lock.json` and `yarn`
+
+If you would like to use yarn, remove `package-lock.json` and use commandline `yarn`
 
 Second, make .env.local file in root directory.
+
 **NOTE: This might be outdated**
 ```
 NEXT_PUBLIC_PROJECT_KEY=
