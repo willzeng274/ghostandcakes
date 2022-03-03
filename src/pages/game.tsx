@@ -11,6 +11,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const dispatch = useDispatch();
   const MyRef = React.useRef(null);
   const CakeRef = React.useRef(null);
+  const Cake2Ref = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
   const [ghostX, setGhostX] = React.useState<number>(500);
   const [ghostY, setGhostY] = React.useState<number>(500);
@@ -18,6 +19,9 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [CY, setCY] = React.useState<number>(0);
   const [cakeX, setCakeX] = React.useState<number>(0);
   const [cakeY, setCakeY] = React.useState<number>(0);
+  const [cake2X, setCake2X] = React.useState<number>(0);
+  const [cake2Y, setCake2Y] = React.useState<number>(0);
+  const [cake2Visible, setCake2Vis] = React.useState<boolean>(false);
   const [counter, setCounter] = React.useState<number>(0);
   const [speed, setSpeed] = React.useState<number>(0.5);
   const [mobile, setMobile] = React.useState<boolean>(false);
@@ -122,6 +126,9 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   useInterval(function() {
     if (over || !start) return;
     const [w, h] = getViewport();
+    if (Math.random() > 0.95) {
+      setCake2Vis(true);
+    }
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
@@ -195,7 +202,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCakeY(randY);
   }
   function handleCakeClick(e: any): void {
-    const cakeR: any = CakeRef.current
+    const cakeR: any = CakeRef.current;
     if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
@@ -204,6 +211,24 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     }
     cakeRandom();
     setCounter(counter+1);
+  }
+  function changeSpeed(amt: number, duration: number): void {
+    setSpeed(speed-amt);
+    setTimeout(() => setSpeed(speed+amt), duration);
+  }
+  function handleCake2Click(e: any): void {
+    const cakeR: any = Cake2Ref.current;
+    if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
+      alert("Cheater alert! You are banned");
+      localStorage.setItem('banned', '1');
+      window.location.href = "/";
+      return;
+    }
+    const [randX, randY]: [number, number] = [Math.floor(Math.random() * (window.innerWidth-100)), Math.floor(Math.random() * (window.innerHeight-100))];
+    setCake2X(randX);
+    setCake2Y(randY);
+    setCake2Vis(false);
+    changeSpeed(10, 10000);
   }
   return (
     <div>
@@ -217,6 +242,23 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
           !over ?
             <>
               <canvas ref={MyRef} />
+              <img
+                ref={Cake2Ref}
+                className={"no-drag"}
+                onClick={handleCake2Click}
+                src="/cake-b.svg"
+                alt=""
+                style={
+                  {
+                    position: "fixed",
+                    top: `${cake2Y}px`,
+                    left: `${cake2X}px`,
+                    width: mobile ? "30vw": "10vw",
+                    height: "auto",
+                    display: cake2Visible ? "block" : "none",
+                  }
+                }
+               />
               <img
                 ref={CakeRef}
                 className={"no-drag"}
