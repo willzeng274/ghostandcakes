@@ -125,7 +125,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
   useInterval(function () {
-    if (Math.random() > 0.96) {
+    if (Math.random() > 0.90) {
       setCake2Vis(true);
     }
   }, 1000);
