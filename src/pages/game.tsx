@@ -28,6 +28,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [start, setStart] = React.useState<boolean>(false);
   const [over, setOver] = React.useState<boolean>(false);
   const [lb, setLb] = React.useState<number>(0);
+  const [frozen, setFrozen] = React.useState<boolean>(false);
   function getViewport() {
     var viewPortWidth;
     var viewPortHeight;
@@ -123,12 +124,15 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   React.useEffect((): void => {
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
+  useInterval(function () {
+    if (Math.random() > 0.1) {
+      setFrozen(true);
+      setCake2Vis(true);
+    }
+  }, 200);
   useInterval(function() {
     if (over || !start) return;
     const [w, h] = getViewport();
-    if (Math.random() > 0.95) {
-      setCake2Vis(true);
-    }
     setRotate((_ => {
       return Math.round(((((Math.atan2(ghostY - CY, ghostX - CX) + 180)  * 180 / Math.PI) - 60) % 360) * 100) / 100;
     })());
@@ -141,18 +145,20 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setGhostY((ghostY: number) => {
       return ghostY + b1;
     })
-    if (counter < 10) {
-      setSpeed(0.5);
-    } else if (counter < 20) {
-      setSpeed(0.75);
-    } else if (counter < 30) {
-      setSpeed(1);
-    } else if (counter < 50) {
-      setSpeed(1.5);
-    } else if (counter < 100) {
-      setSpeed(2);
-    } else {
-      setSpeed(Math.floor((counter / 50) * 100) / 100);
+    if (!frozen) {
+      if (counter < 10) {
+        setSpeed(0.5);
+      } else if (counter < 20) {
+        setSpeed(0.75);
+      } else if (counter < 30) {
+        setSpeed(1);
+      } else if (counter < 50) {
+        setSpeed(1.5);
+      } else if (counter < 100) {
+        setSpeed(2);
+      } else {
+        setSpeed(Math.floor((counter / 50) * 100) / 100);
+      }
     }
     if (Math.round(CX - ghostX - 50) === 0 && Math.round(CY- ghostY - 40) === 0) {
       if (!over) {
@@ -213,8 +219,8 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCounter(counter+1);
   }
   function changeSpeed(amt: number, duration: number): void {
-    setSpeed(speed-amt);
-    setTimeout(() => setSpeed(speed+amt), duration);
+    setSpeed(speed/amt);
+    setTimeout(() => {setSpeed(speed/amt); setFrozen(false);}, duration);
   }
   function handleCake2Click(e: any): void {
     const cakeR: any = Cake2Ref.current;
@@ -228,7 +234,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCake2X(randX);
     setCake2Y(randY);
     setCake2Vis(false);
-    changeSpeed(10, 10000);
+    changeSpeed(3, 5000);
   }
   return (
     <div>
