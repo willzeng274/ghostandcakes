@@ -125,8 +125,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
   }, [dispatch]);
   useInterval(function () {
-    if (Math.random() > 0.1) {
-      setFrozen(true);
+    if (Math.random() > 0.95) {
       setCake2Vis(true);
     }
   }, 200);
@@ -234,6 +233,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCake2X(randX);
     setCake2Y(randY);
     setCake2Vis(false);
+    setFrozen(true);
     changeSpeed(3, 5000);
   }
   return (
