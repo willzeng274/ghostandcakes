@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Input } from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { Button } from '@chakra-ui/react';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import ChatRoom from '../components/room';
@@ -23,7 +23,6 @@ export const auth = getAuth();
 
 export default function Component() {
   const dispatch = useAppDispatch();
-  const [user, setUser] = React.useState<any>();
   function getSignIn() {
     signInWithPopup(auth, provider)
       .then((result: any) => {
@@ -32,7 +31,6 @@ export default function Component() {
         if (credential?.idToken) {
           localStorage.setItem("idToken", credential?.idToken);
         }
-        setUser(result.user);
         dispatch(setToken(token));
       }).catch((error: any) => {
         const errorCode = error.code;
@@ -52,8 +50,6 @@ export default function Component() {
         if (credential?.idToken) {
           localStorage.setItem("idToken", credential?.idToken);
         }
-        const user = result.user;
-        setUser(user);
         dispatch(setToken(token));
       }).catch((error: any) => {
         const errorCode = error.code;

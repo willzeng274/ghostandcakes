@@ -15,6 +15,7 @@
     "@chakra-ui/react": "^1.8.3",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@prisma/client": "^3.10.0",
     "@reduxjs/toolkit": "^1.7.2",
     "axios": "^0.25.0",
     "deta": "^1.0.1",

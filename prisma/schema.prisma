@@ -1,0 +1,73 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  username  String   @db.VarChar(63)
+  email     String   @unique
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  posts     Post[]
+  bio       String?  @db.VarChar(255)
+  guilds    Guild[]
+  googldUID String?
+}
+
+model Post {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+  content   String?
+  published Boolean  @default(false)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index(authorId)
+}
+
+model Guild {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  channels  Channel[]
+  ownerId   Int       @db.UnsignedInt
+  owner     User      @relation(fields: [ownerId], references: [id])
+  name      String
+  createdAt DateTime  @default(now())
+
+  @@index(ownerId)
+}
+
+model Channel {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  guild       Guild     @relation(fields: [guildId], references: [id])
+  guildId     Int       @db.UnsignedInt
+  messages    Message[]
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  position    Int
+
+  @@unique([guildId, name], name: "channel_name_unique_per_guild_constraint")
+  @@unique([guildId, position], name: "channel_position_unique_per_guild_constraint")
+  @@index(guildId)
+}
+
+model Message {
+  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  channelId     Int     @db.UnsignedInt
+  channel       Channel @relation(fields: [channelId], references: [id])
+  content       String  @db.VarChar(4096)
+  authorId      Int     @db.UnsignedInt
+  referenceId   Int?    @db.UnsignedInt
+  attachmentUrl String?
+
+  @@index(channelId)
+}

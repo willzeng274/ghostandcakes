@@ -3,8 +3,8 @@ import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
-import { Fetch } from '../helpers/deta'
-import { Button } from '@chakra-ui/react'
+// import { Fetch } from '../helpers/deta'
+import { Button, Flex, Progress, Text } from '@chakra-ui/react'
 import useEventListener from '../helpers/listener'
 
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -28,7 +28,8 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   const [start, setStart] = React.useState<boolean>(false);
   const [over, setOver] = React.useState<boolean>(false);
   const [lb, setLb] = React.useState<number>(0);
-  const [frozen, setFrozen] = React.useState<boolean>(false);
+  const [frozen, setFrozen] = React.useState<number>(0);
+  const [freezeSpawn, setFreezeSpawn] = React.useState<number>(0);
   function getViewport() {
     var viewPortWidth;
     var viewPortHeight;
@@ -52,8 +53,8 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     const canv: any = MyRef.current;
     const ctx = canv.getContext("2d");
     ctx.clearRect(0, 0, canv.width, canv.height);
-    ctx.font = "30px Arial";
-    ctx.fillText("Points: " + String(counter), 0, 25);
+    ctx.font = "48px Arial";
+    ctx.fillText("Points: " + String(counter), canv.width/10, canv.height/1.6);
   }, [counter, start, over]);
   useEventListener("mousemove", (e: any) => {
     if (localStorage.getItem('banned') === '1') {
@@ -121,14 +122,17 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       setOver(false);
     }
   });
-  React.useEffect((): void => {
-    console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
-  }, [dispatch]);
+  // React.useEffect((): void => {
+  //   console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
+  // }, [dispatch]);
   useInterval(function () {
-    if (Math.random() > 0.95) {
-      setCake2Vis(true);
-    }
-  }, 200);
+    setCake2Vis(true);
+    setFreezeSpawn(Math.floor(Math.random() * (12000 - 6000 + 1) + 6000))
+  }, freezeSpawn);
+  useInterval(function () {
+    if (frozen < 1) return;
+    setFrozen(frozen-1);
+  }, 33);
   useInterval(function() {
     if (over || !start) return;
     const [w, h] = getViewport();
@@ -137,7 +141,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     })());
     const a: number = CX - ghostX - 50, b: number = CY-ghostY - 40, c: number = Math.sqrt(a**2 + b**2);
     const sped: number = speed*(mobile ? 1 : Math.min(w/1538.1, h/806.1));
-    const ratio: number = (sped)/c, a1: number = a*ratio, b1 : number = b*ratio;
+    const ratio: number = (frozen ? sped /3 : sped)/c, a1: number = a*ratio, b1 : number = b*ratio;
     setGhostX((ghostX: number) => {
       return ghostX + a1;
     });
@@ -217,11 +221,8 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     cakeRandom();
     setCounter(counter+1);
   }
-  function changeSpeed(amt: number, duration: number): void {
-    setSpeed(speed/amt);
-    setTimeout(() => {setSpeed(speed/amt); setFrozen(false);}, duration);
-  }
   function handleCake2Click(e: any): void {
+    setFrozen(50);
     const cakeR: any = Cake2Ref.current;
     if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
@@ -233,8 +234,6 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCake2X(randX);
     setCake2Y(randY);
     setCake2Vis(false);
-    setFrozen(true);
-    changeSpeed(3, 5000);
   }
   return (
     <div>
@@ -247,7 +246,15 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
         start ? 
           !over ?
             <>
-              <canvas ref={MyRef} />
+              <Flex alignItems="center" justifyContent="center">
+                <canvas ref={MyRef} style={{width: "10vw", alignSelf: "flex-start"}} />
+                <Flex width="80vw" alignItems="center" justifyContent="center">
+                  <Text width="10%">
+                    {"Freeze: "}{frozen}
+                  </Text>
+                  <Progress width="90%" value={frozen} min={0} max={50} hasStripe />
+                </Flex>
+              </Flex>
               <img
                 ref={Cake2Ref}
                 className={"no-drag"}
@@ -264,7 +271,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
                     display: cake2Visible ? "block" : "none",
                   }
                 }
-               />
+              />
               <img
                 ref={CakeRef}
                 className={"no-drag"}
@@ -318,7 +325,10 @@ export default Game
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
-      items: (await Fetch()).sort((a, b) => -(a as any).points + (b as any).points)
+      items: [
+        {},
+      ]
+      // items: (await Fetch()).sort((a, b) => -(a as any).points + (b as any).points)
     }
   }
 }
