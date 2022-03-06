@@ -48,7 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     username: req.body.username,
                     email: req.body.email,
                     password: req.body.password,
-                    createdAt: new Date()
                 }
             });
             const accessToken = jwt.sign({
