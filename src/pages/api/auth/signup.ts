@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     avatarUrl: user.avatarUrl,
                     createdAt: user.createdAt,
                     iat: Math.floor(Date.now() / 1000)
-                }, "test", {
+                }, process.env.SECRET_JWT as string, {
                     expiresIn: 24 * 60 * 1 // 1 is minute, one day
                 });
                 res.status(200).json({
@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 avatarUrl: usr.avatarUrl,
                 createdAt: usr.createdAt,
                 iat: Math.floor(Date.now() / 1000)
-            }, "tttttt", {
+            }, process.env.SECRET_JWT as string, {
                 expiresIn: 24 * 60 * 1 // 1 is minute, one day
             });
             res.status(200).json({
