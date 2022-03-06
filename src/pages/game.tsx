@@ -132,7 +132,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   useInterval(function () {
     if (frozen < 1) return;
     setFrozen(frozen-1);
-  }, 33);
+  }, 50);
   useInterval(function() {
     if (over || !start) return;
     const [w, h] = getViewport();
