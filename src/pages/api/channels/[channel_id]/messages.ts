@@ -35,9 +35,11 @@ export default async function Get(req: NextApiRequest, res: NextApiResponse) {
         } else {
             res.status(405).json({message: "Method not allowed."})
         }
-    } catch (err) {
+    } catch (err: any) {
+        console.log(err);
+        console.log(err.message);
         res.status(400).json({
-            message: err
+            message: err.message
         });
     }
 }

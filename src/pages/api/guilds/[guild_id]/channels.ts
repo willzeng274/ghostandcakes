@@ -14,7 +14,7 @@ export default async function Get(req: NextApiRequest, res: NextApiResponse) {
     try {
         jwt.verify(req.headers.authorization, process.env.SECRET_JWT as string);
         if (req.method === "POST") {
-            if (req.body.message && req.body.name) {
+            if (req.body.name) {
                 const { guild_id } = req.query;
                 const data = await prisma.channel.findMany({
                     where: {
@@ -46,9 +46,11 @@ export default async function Get(req: NextApiRequest, res: NextApiResponse) {
         } else {
             res.status(405).json({message: "Method not allowed."})
         }
-    } catch (err) {
+    } catch (err: any) {
+        console.log(err);
+        console.log(err.message);
         res.status(400).json({
-            message: err
+            message: err.message
         });
     }
 }

@@ -14,7 +14,7 @@ export default async function Get(req: NextApiRequest, res: NextApiResponse) {
     try {
         const user: any = jwt.verify(req.headers.authorization, process.env.SECRET_JWT as string);
         if (req.method === "POST") {
-            if (req.body.message && req.body.name) {
+            if (req.body.name) {
                 await prisma.guild.create({
                     data: {
                         ownerId: Number(user.id),
@@ -32,9 +32,9 @@ export default async function Get(req: NextApiRequest, res: NextApiResponse) {
         } else {
             res.status(405).json({message: "Method not allowed."})
         }
-    } catch (err) {
+    } catch (err: any) {
         res.status(400).json({
-            message: err
+            message: err.message
         });
     }
 }
