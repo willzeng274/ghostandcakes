@@ -32,7 +32,7 @@ export default async function Get(req: NextApiRequest, res: NextApiResponse) {
                     data: {
                         guildId: Number(guild_id),
                         name: req.body.name,
-                        position: data[0].position+1
+                        position: (data[0]?.position ? data[0]?.position : 0)+1
                     }
                 });
                 res.status(205).end();
