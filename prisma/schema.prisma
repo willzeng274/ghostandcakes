@@ -12,15 +12,15 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  username  String   @db.VarChar(63)
+  username  String   @db.VarChar(64)
   email     String   @unique
-  password  String
-  avatarUrl String?
+  password  String   @db.LongText
+  avatarUrl String?  @db.Text
   createdAt DateTime @default(now())
   posts     Post[]
   bio       String?  @db.VarChar(255)
   guilds    Guild[]
-  googleUID String?
+  googleUID String?  @db.VarChar(2048)
 }
 
 model Post {
@@ -28,7 +28,7 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   title     String   @db.VarChar(255)
-  content   String?
+  content   String?  @db.LongText
   published Boolean  @default(false)
   authorId  Int
   author    User     @relation(fields: [authorId], references: [id])
@@ -41,7 +41,7 @@ model Guild {
   channels  Channel[]
   ownerId   Int       @db.UnsignedInt
   owner     User      @relation(fields: [ownerId], references: [id])
-  name      String
+  name      String    @db.VarChar(64)
   createdAt DateTime  @default(now())
 
   @@index(ownerId)
@@ -52,8 +52,8 @@ model Channel {
   guild       Guild     @relation(fields: [guildId], references: [id])
   guildId     Int       @db.UnsignedInt
   messages    Message[]
-  name        String
-  description String?
+  name        String    @db.VarChar(64)
+  description String?   @db.Text
   createdAt   DateTime  @default(now())
   position    Int
 
@@ -69,7 +69,7 @@ model Message {
   content       String  @db.VarChar(4096)
   authorId      Int     @db.UnsignedInt
   referenceId   Int?    @db.UnsignedInt
-  attachmentUrl String?
+  attachmentUrl String? @db.VarChar(2048)
 
   @@index(channelId)
 }

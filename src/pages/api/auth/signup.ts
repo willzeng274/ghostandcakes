@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client';
 import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 
 const prisma = new PrismaClient();
 
@@ -23,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         });
         if (user) {
-            if (user.password === req.body.password && user.username === req.body.username) {
+            if (await bcrypt.compare(req.body.password, user.password) && user.username === req.body.username) {
                 const accessToken = jwt.sign({
                     username: req.body.username,
                     email: req.body.email,
@@ -47,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 data: {
                     username: req.body.username,
                     email: req.body.email,
-                    password: req.body.password,
+                    password: await bcrypt.hash(req.body.password, 10),
                 }
             });
             const accessToken = jwt.sign({
