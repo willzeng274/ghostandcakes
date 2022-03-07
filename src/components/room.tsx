@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import { Box, Button, Text } from "@chakra-ui/react"
 import { signOut } from "firebase/auth";
-import { auth } from "../pages/chat";
+import { auth } from "../pages/chat_fb";
 import {  useAppSelector } from "../reducers/settings";
 import Messages from "./messages";
 

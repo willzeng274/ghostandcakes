@@ -11,16 +11,28 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  username  String   @db.VarChar(64)
-  email     String   @unique
-  password  String   @db.LongText
-  avatarUrl String?  @db.Text
-  createdAt DateTime @default(now())
+  id        Int             @id @default(autoincrement()) @db.UnsignedInt
+  username  String          @db.VarChar(64)
+  email     String          @unique
+  password  String          @db.LongText
+  avatarUrl String?         @db.Text
+  createdAt DateTime        @default(now())
   posts     Post[]
-  bio       String?  @db.VarChar(255)
+  bio       String?         @db.VarChar(255)
   guilds    Guild[]
-  googleUID String?  @db.VarChar(2048)
+  googleUID String?         @db.VarChar(2048)
+  archived  Boolean         @default(false)
+  online    Boolean         @default(false)
+  friends   Relationships[]
+}
+
+model Relationships {
+  id       Int  @id @default(autoincrement()) @db.UnsignedInt
+  userId   Int  @db.UnsignedInt
+  user     User @relation(fields: [userId], references: [id])
+  friendId Int  @db.UnsignedInt
+
+  @@index(userId)
 }
 
 model Post {
@@ -30,10 +42,17 @@ model Post {
   title     String   @db.VarChar(255)
   content   String?  @db.LongText
   published Boolean  @default(false)
-  authorId  Int
+  authorId  Int      @db.UnsignedInt
   author    User     @relation(fields: [authorId], references: [id])
 
   @@index(authorId)
+}
+
+model Member {
+  id      BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  userId  Int    @db.UnsignedInt
+  guildId Int    @db.UnsignedInt
+  guild   Guild  @relation(fields: [guildId], references: [id])
 }
 
 model Guild {
@@ -43,6 +62,7 @@ model Guild {
   owner     User      @relation(fields: [ownerId], references: [id])
   name      String    @db.VarChar(64)
   createdAt DateTime  @default(now())
+  members   Member[]
 
   @@index(ownerId)
 }
@@ -63,7 +83,7 @@ model Channel {
 }
 
 model Message {
-  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  id            BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
   channelId     Int     @db.UnsignedInt
   channel       Channel @relation(fields: [channelId], references: [id])
   content       String  @db.VarChar(4096)
