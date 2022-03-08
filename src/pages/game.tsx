@@ -212,7 +212,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   }
   function handleCakeClick(e: any): void {
     const cakeR: any = CakeRef.current;
-    if ((cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
+    if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
       window.location.href = "/";
@@ -224,7 +224,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   function handleCake2Click(e: any): void {
     setFrozen(50);
     const cakeR: any = Cake2Ref.current;
-    if ((cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
+    if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
       window.location.href = "/";
