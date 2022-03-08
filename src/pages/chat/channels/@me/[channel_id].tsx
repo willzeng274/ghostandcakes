@@ -3,22 +3,10 @@ import { useRouter } from 'next/router'
 
 const ChatApp: NextPage = ({ refreshToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     const router = useRouter();
-    const { route } = router.query;
-    if (!route || (Array.isArray(route) && route[0] !== "channels" && route[0] !== "@me")) {
-        return <>Error</>
-    } else if (route[0] === "@me") {
-        
-    } else if (route[0] === "channels") {
-
-    } else {
-        // shouldn't reach here
-        return <>Unexpected</>
-    }
+    const { channel_id } = router.query;
     return (
         <>
-            {JSON.stringify(route)}
-            {"\nCookies: \n"}
-            {refreshToken}
+            {JSON.stringify(channel_id)}
         </>
     )
 }
