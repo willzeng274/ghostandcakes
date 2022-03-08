@@ -212,7 +212,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   }
   function handleCakeClick(e: any): void {
     const cakeR: any = CakeRef.current;
-    if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
+    if ((cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
       window.location.href = "/";
@@ -224,7 +224,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   function handleCake2Click(e: any): void {
     setFrozen(50);
     const cakeR: any = Cake2Ref.current;
-    if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
+    if ((cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
       window.location.href = "/";
@@ -258,7 +258,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
               <img
                 ref={Cake2Ref}
                 className={"no-drag"}
-                onClick={handleCake2Click}
+                onMouseDown={handleCake2Click}
                 src="/cake-b.svg"
                 alt=""
                 style={
@@ -275,7 +275,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
               <img
                 ref={CakeRef}
                 className={"no-drag"}
-                onClick={handleCakeClick}
+                onMouseDown={handleCakeClick}
                 src="/cake-a.svg"
                 alt=""
                 style={
