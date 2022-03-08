@@ -23,6 +23,7 @@ export const auth = getAuth();
 
 export default function Component() {
   const dispatch = useAppDispatch();
+  const [user, setUser] = React.useState<any>();
   function getSignIn() {
     signInWithPopup(auth, provider)
       .then((result: any) => {
@@ -31,6 +32,7 @@ export default function Component() {
         if (credential?.idToken) {
           localStorage.setItem("idToken", credential?.idToken);
         }
+        setUser(result.user);
         dispatch(setToken(token));
       }).catch((error: any) => {
         const errorCode = error.code;
@@ -50,6 +52,7 @@ export default function Component() {
         if (credential?.idToken) {
           localStorage.setItem("idToken", credential?.idToken);
         }
+        setUser(result.user);
         dispatch(setToken(token));
       }).catch((error: any) => {
         const errorCode = error.code;
@@ -61,7 +64,7 @@ export default function Component() {
   return (
     <>
       {
-        auth.currentUser ? (
+        user ? (
           <ChatRoom />
         ) : (
           <Button onClick={getSignIn}>Sign In</Button>
