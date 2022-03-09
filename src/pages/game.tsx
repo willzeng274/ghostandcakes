@@ -258,7 +258,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
               <img
                 ref={Cake2Ref}
                 className={"no-drag"}
-                onClick={handleCake2Click}
+                onMouseDown={handleCake2Click}
                 src="/cake-b.svg"
                 alt=""
                 style={
@@ -275,7 +275,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
               <img
                 ref={CakeRef}
                 className={"no-drag"}
-                onClick={handleCakeClick}
+                onMouseDown={handleCakeClick}
                 src="/cake-a.svg"
                 alt=""
                 style={
