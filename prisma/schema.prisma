@@ -26,11 +26,20 @@ model User {
   friends   Relationships[]
 }
 
+enum RelationshipType {
+  friend
+  shared
+  blocked
+  pendingSender
+  pendingReceiver
+}
+
 model Relationships {
   id       Int  @id @default(autoincrement()) @db.UnsignedInt
   userId   Int  @db.UnsignedInt
   user     User @relation(fields: [userId], references: [id])
   friendId Int  @db.UnsignedInt
+  type     RelationshipType
 
   @@index(userId)
 }
@@ -67,6 +76,11 @@ model Guild {
   @@index(ownerId)
 }
 
+enum ChannelType {
+  textChannel
+  categoryChannel
+}
+
 model Channel {
   id          Int       @id @default(autoincrement()) @db.UnsignedInt
   guild       Guild     @relation(fields: [guildId], references: [id])
@@ -76,6 +90,9 @@ model Channel {
   description String?   @db.Text
   createdAt   DateTime  @default(now())
   position    Int
+  parentId    Int?
+  type        ChannelType
+  ratelimit   Int       @default(0)
 
   @@unique([guildId, name], name: "channel_name_unique_per_guild_constraint")
   @@unique([guildId, position], name: "channel_position_unique_per_guild_constraint")

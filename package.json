@@ -3,7 +3,7 @@
     "type": "git",
     "url": "https://github.com/NastyPigz/ghostandcakes"
   },
-  "name": "great",
+  "name": "ghostandcakes",
   "private": true,
   "scripts": {
     "dev": "next dev",

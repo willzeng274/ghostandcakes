@@ -1,12 +1,12 @@
 import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
 import NextLink from "next/link"
+import MainFrame from '../../../../components/chat/MainFrame'
 
 const ChatApp: NextPage = ({ refreshToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     return (
         <>
-            <NextLink href="/chat/channels/@me/438">
-                <a>T</a>
-            </NextLink>
+            <MainFrame>
+            </MainFrame>
         </>
     )
 }

@@ -2,6 +2,10 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
+import Image from 'next/image';
+import cakeSvg from "/public/cake-a.svg";
+import { Box } from '@chakra-ui/react';
+import ghostPng from "/public/ghost.png";
 
 const Home: NextPage = () => {
   const [rotate, setRotate] = React.useState<number>(0);
@@ -49,8 +53,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <p>{counter}</p>
-      <img onClick={handleCakeClick} src="/cake-a.svg" alt="" style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}} />
-      <img alt="" onMouseOver={handleMouseOver} src="/ghost.png" width={100} height={100} style={{position: "fixed", top: `${ghostY}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}} />
+      <Box style={{position: "fixed", top: `${cakeY}px`, left: `${cakeX}px`}}>
+        <Image onClick={handleCakeClick} src={cakeSvg} alt="" />
+      </Box>
+      <Box width={100} height={100} style={{position: "fixed", top: `${ghostY}px`, left: `${ghostX}px`, transform: `rotate(${rotate}deg)`}}>
+        <Image alt="" onMouseOver={handleMouseOver} src={ghostPng} />
+      </Box>
     </div>
   )
 }

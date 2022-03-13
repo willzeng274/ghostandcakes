@@ -4,8 +4,14 @@ import React from 'react'
 import { useInterval } from '../helpers/useInterval'
 import { useDispatch } from 'react-redux'
 // import { Fetch } from '../helpers/deta'
-import { Button, Flex, Progress, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Progress, Text } from '@chakra-ui/react'
 import useEventListener from '../helpers/listener'
+import Image from 'next/image'
+import cakeBSvg from '/public/cake-b.svg';
+import cakeASvg from '/public/cake-a.svg';
+import ghostPng from '/public/ghost.png';
+cakeASvg.width = cakeBSvg.width;
+cakeASvg.height = cakeBSvg.height;
 
 const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const dispatch = useDispatch();
@@ -255,13 +261,7 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
                   <Progress width="90%" value={frozen} min={0} max={50} hasStripe />
                 </Flex>
               </Flex>
-              <img
-                ref={Cake2Ref}
-                className={"no-drag"}
-                onMouseDown={handleCake2Click}
-                src="/cake-b.svg"
-                alt=""
-                style={
+              <Box ref={Cake2Ref} style={
                   {
                     position: "fixed",
                     top: `${cake2Y}px`,
@@ -270,15 +270,10 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
                     height: "auto",
                     display: cake2Visible ? "block" : "none",
                   }
-                }
-              />
-              <img
-                ref={CakeRef}
-                className={"no-drag"}
-                onMouseDown={handleCakeClick}
-                src="/cake-a.svg"
-                alt=""
-                style={
+              }>
+                <Image alt="" className={"no-drag"} onMouseDown={handleCake2Click} src={cakeBSvg}  />
+              </Box>
+              <Box ref={CakeRef} style={
                   {
                     position: "fixed",
                     top: `${cakeY}px`,
@@ -286,21 +281,21 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
                     width: mobile ? "30vw" : "10vw",
                     height: "auto",
                   }
-                }
-              />
-              <img
-                alt=""
-                onMouseOver={handleMouseOver}
-                src="/ghost.png" width={100} height={100}
-                style={{
+              }>
+                <Image className={"no-drag"} onMouseDown={handleCakeClick} src={cakeASvg} alt="" />
+              </Box>
+              <Box style={{
                   position: "fixed",
                   top: `${ghostY}px`,
                   left: `${ghostX}px`,
                   transform: `rotate(${rotate}deg)`,
                   width: mobile ? "30vw" :"10vw",
                   height: "auto"
-                }}
-              />
+              }}>
+                <Image alt=""
+                onMouseOver={handleMouseOver}
+                src={ghostPng} />
+              </Box>
             </>
           :
             <>

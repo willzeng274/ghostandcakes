@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Button } from '@chakra-ui/react';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
-import ChatRoom from '../components/room';
+import ChatRoom from '../components/chat_legacy/room';
 import { useAppDispatch } from '../reducers/settings';
 import { setToken } from '../reducers/token';
 

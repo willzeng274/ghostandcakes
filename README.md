@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 ```
-Database: Deta Base SDK ( migrating to PlanetScale MySQL ), Deta Drive File Storage
+Database: PlanetScale MySQL, Deta Drive File Storage
 Static Site Host: Vercel
 API Host: Vercel Serverless Functions ( AWS Lambda )
 WS Host: Railway
