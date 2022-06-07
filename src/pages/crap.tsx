@@ -2,7 +2,6 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import React from 'react'
 import { useInterval } from '../helpers/useInterval'
-import { useDispatch } from 'react-redux'
 import {
   Box,
   Button,
@@ -38,7 +37,6 @@ interface Invader {
 const ghostX = 50;
 
 const Home: NextPage = () => {
-  const dispatch = useDispatch();
   const player = React.useRef(null);
   const [rotate, setRotate] = React.useState<number>(0);
   const [spawnRate, setSpawnrate] = React.useState<number>(0);
@@ -98,9 +96,6 @@ const Home: NextPage = () => {
       return () => window.removeEventListener('mousemove', abc);
     }
   }, []);
-  React.useEffect((): void => {
-    console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
-  }, [dispatch]);
   React.useEffect((): void => {
     if (over) {
       setBullets([]);

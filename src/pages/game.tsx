@@ -1,41 +1,38 @@
-import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
-import Head from 'next/head'
-import React from 'react'
-import { useInterval } from '../helpers/useInterval'
-import { useDispatch } from 'react-redux'
-// import { Fetch } from '../helpers/deta'
-import { Box, Button, Flex, Progress, Text } from '@chakra-ui/react'
-import useEventListener from '../helpers/listener'
-import Image from 'next/image'
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import React, { useState, useEffect, useRef, MouseEvent } from 'react';
+import { useInterval } from '../helpers/useInterval';
+import { Box, Button, Flex, Progress, Text } from '@chakra-ui/react';
+import useEventListener from '../helpers/listener';
+import Image from 'next/image';
 import cakeBSvg from '/public/cake-b.svg';
 import cakeASvg from '/public/cake-a.svg';
 import ghostPng from '/public/ghost.png';
 cakeASvg.width = cakeBSvg.width;
 cakeASvg.height = cakeBSvg.height;
 
-const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const dispatch = useDispatch();
-  const MyRef = React.useRef(null);
-  const CakeRef = React.useRef(null);
-  const Cake2Ref = React.useRef(null);
-  const [rotate, setRotate] = React.useState<number>(0);
-  const [ghostX, setGhostX] = React.useState<number>(500);
-  const [ghostY, setGhostY] = React.useState<number>(500);
-  const [CX, setCX] = React.useState<number>(0);
-  const [CY, setCY] = React.useState<number>(0);
-  const [cakeX, setCakeX] = React.useState<number>(0);
-  const [cakeY, setCakeY] = React.useState<number>(0);
-  const [cake2X, setCake2X] = React.useState<number>(0);
-  const [cake2Y, setCake2Y] = React.useState<number>(0);
-  const [cake2Visible, setCake2Vis] = React.useState<boolean>(false);
-  const [counter, setCounter] = React.useState<number>(0);
-  const [speed, setSpeed] = React.useState<number>(0.5);
-  const [mobile, setMobile] = React.useState<boolean>(false);
-  const [start, setStart] = React.useState<boolean>(false);
-  const [over, setOver] = React.useState<boolean>(false);
-  const [lb, setLb] = React.useState<number>(0);
-  const [frozen, setFrozen] = React.useState<number>(0);
-  const [freezeSpawn, setFreezeSpawn] = React.useState<number>(0);
+const Game: NextPage = () => {
+  const MyRef = useRef<HTMLCanvasElement | null>(null);
+  const CakeRef = useRef<HTMLDivElement | null>(null);
+  const Cake2Ref = useRef<HTMLDivElement | null>(null);
+  const [rotate, setRotate] = useState<number>(0);
+  const [ghostX, setGhostX] = useState<number>(500);
+  const [ghostY, setGhostY] = useState<number>(500);
+  const [CX, setCX] = useState<number>(0);
+  const [CY, setCY] = useState<number>(0);
+  const [cakeX, setCakeX] = useState<number>(0);
+  const [cakeY, setCakeY] = useState<number>(0);
+  const [cake2X, setCake2X] = useState<number>(0);
+  const [cake2Y, setCake2Y] = useState<number>(0);
+  const [cake2Visible, setCake2Vis] = useState<boolean>(false);
+  const [counter, setCounter] = useState<number>(0);
+  const [speed, setSpeed] = useState<number>(0.5);
+  const [mobile, setMobile] = useState<boolean>(false);
+  const [start, setStart] = useState<boolean>(false);
+  const [over, setOver] = useState<boolean>(false);
+  const [lb, setLb] = useState<number>(0);
+  const [frozen, setFrozen] = useState<number>(0);
+  const [freezeSpawn, setFreezeSpawn] = useState<number>(0);
   function getViewport() {
     var viewPortWidth;
     var viewPortHeight;
@@ -52,17 +49,23 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     }
     return [viewPortWidth, viewPortHeight];
   }
-  React.useEffect((): void => {
+  useEffect((): void => {
     if (!start || over) {
       return;
     }
-    const canv: any = MyRef.current;
+    const canv: HTMLCanvasElement | null = MyRef.current;
+    if (!canv) {
+      return;
+    }
     const ctx = canv.getContext("2d");
+    if (!ctx) {
+      return;
+    }
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.font = "48px Arial";
     ctx.fillText("Points: " + String(counter), canv.width/10, canv.height/1.6);
   }, [counter, start, over]);
-  useEventListener("mousemove", (e: any) => {
+  useEventListener("mousemove", (e: MouseEvent) => {
     if (localStorage.getItem('banned') === '1') {
       alert("You are banned from the game");
       window.location.href = "/";
@@ -75,13 +78,13 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
         /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
       )
     );
-    if (isMobile && (e?.target as any)?.classList[0] !== "no-drag") {
+    if (isMobile && (e.target as HTMLBodyElement)?.classList[0] !== "no-drag") {
       return;
     }
     setCX(e.clientX);
     setCY(e.clientY);
   });
-  React.useEffect((): void => {
+  useEffect((): void => {
     const userAgent =
       typeof window.navigator === "undefined" ? "" : navigator.userAgent;
     setMobile(Boolean(
@@ -90,17 +93,14 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       )
     ));
   }, [mobile]);
-  React.useEffect((): void => {
-    console.log("LEADERBOARD: ", items);
-  }, [items]);
-  React.useEffect(() => {
+  useEffect((): void => {
     if (!localStorage.getItem("lb")) {
       localStorage.setItem("lb", String(lb))
     } else {
       setLb(+(localStorage.getItem("lb") as string))
     }
   }, []);
-  React.useEffect(() => {
+  useEffect((): void => {
     if (lb > 0) {
       localStorage.setItem("lb", String(lb))
     }
@@ -109,17 +109,15 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     if (over) {
       setOver(false);
     }
-  });
-  React.useEffect(() => {
-    if (!over) {
-      setCounter(0);
-    }
-  }, [over]);
-  useEventListener("keyup", () => {
     if (!start) {
       setStart(true);
     }
   });
+  useEffect((): void => {
+    if (!over) {
+      setCounter(0);
+    }
+  }, [over]);
   useEventListener("mouseup", () => {
     if (!start) {
       setStart(true);
@@ -128,9 +126,6 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
       setOver(false);
     }
   });
-  // React.useEffect((): void => {
-  //   console.log(dispatch({type: "INCREMENT", payload: {value: 1}}));
-  // }, [dispatch]);
   useInterval(function () {
     setCake2Vis(true);
     setFreezeSpawn(Math.floor(Math.random() * (12000 - 6000 + 1) + 6000))
@@ -185,21 +180,6 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     if (counter > lb) {
       setLb(counter);
     }
-    if (counter >= items[items.length-1].points) {
-      // screw the leaderboard idea
-
-      // fetch("/api/views", {
-      //   method: "POST",
-      //   headers: {
-      //     Accept: '*',
-      //     "Content-Type": "application/json"
-      //   },
-      //   body: JSON.stringify({
-      //     name: prompt("Give name! You're on the leaderboard") || "user",
-      //     points: counter
-      //   })
-      // }).then((res) => res.json()).then((res) => console.log(res))
-    }
     setOver(true);
   }
   function between(x: number, min: number, max: number): boolean {
@@ -216,8 +196,11 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     setCakeX(randX);
     setCakeY(randY);
   }
-  function handleCakeClick(e: any): void {
-    const cakeR: any = CakeRef.current;
+  function handleCakeClick(e: MouseEvent<HTMLImageElement>): void {
+    const cakeR: HTMLDivElement | null = CakeRef.current;
+    if (!cakeR) {
+      return;
+    }
     if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
@@ -227,9 +210,12 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
     cakeRandom();
     setCounter(counter+1);
   }
-  function handleCake2Click(e: any): void {
+  function handleCake2Click(e: MouseEvent<HTMLImageElement>): void {
     setFrozen(50);
-    const cakeR: any = Cake2Ref.current;
+    const cakeR: HTMLDivElement | null = Cake2Ref.current;
+    if (!cakeR) {
+      return;
+    }
     if (!e.isTrusted || (cakeR.style.width !== "10vw" && !mobile) || (cakeR.style.width !== "30vw" && mobile)) {
       alert("Cheater alert! You are banned");
       localStorage.setItem('banned', '1');
@@ -315,15 +301,4 @@ const Game: NextPage = ({ items }: InferGetServerSidePropsType<typeof getServerS
   )
 }
 
-export default Game
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    props: {
-      items: [
-        {},
-      ]
-      // items: (await Fetch()).sort((a, b) => -(a as any).points + (b as any).points)
-    }
-  }
-}
+export default Game;
