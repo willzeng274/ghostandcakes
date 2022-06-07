@@ -1,21 +1,50 @@
-import { useRef, useEffect } from "react";
+import { RefObject, useEffect, useRef } from 'react';
+import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect';
 
-export default function useEventListener(eventName: any, handler: any, element: any = null) {
-    const savedHandler = useRef<any>(null);
-    useEffect(() => {
-      savedHandler.current = handler;
-    }, [handler]);
-    useEffect(
-      () => {
-        if (!element) element = window;
-        const isSupported = element && element.addEventListener;
-        if (!isSupported) return;
-        const eventListener = (event: any) => savedHandler.current(event);
-        element.addEventListener(eventName, eventListener);
-        return () => {
-          element.removeEventListener(eventName, eventListener);
-        };
-      },
-      [eventName, element]
-    );
-  }
+function useEventListener<K extends keyof WindowEventMap>(
+  eventName: K,
+  handler: (event: WindowEventMap[K]) => void,
+): void;
+function useEventListener<
+  K extends keyof HTMLElementEventMap,
+  T extends HTMLElement = HTMLDivElement,
+>(
+  eventName: K,
+  handler: (event: HTMLElementEventMap[K]) => void,
+  element: RefObject<T>,
+): void;
+
+function useEventListener<
+  KW extends keyof WindowEventMap,
+  KH extends keyof HTMLElementEventMap,
+  T extends HTMLElement | void = void,
+>(
+  eventName: KW | KH,
+  handler: (
+    event: WindowEventMap[KW] | HTMLElementEventMap[KH] | Event,
+  ) => void,
+  element?: RefObject<T>,
+) {
+  const savedHandler = useRef(handler);
+
+  useIsomorphicLayoutEffect(() => {
+    savedHandler.current = handler;
+  }, [handler]);
+
+  useEffect(() => {
+    const targetElement: T | Window = element?.current || window;
+    if (!(targetElement && targetElement.addEventListener)) {
+      return;
+    }
+
+    const eventListener: typeof handler = event => savedHandler.current(event);
+
+    targetElement.addEventListener(eventName, eventListener);
+
+    return () => {
+      targetElement.removeEventListener(eventName, eventListener);
+    }
+  }, [eventName, element]);
+}
+
+export default useEventListener;
