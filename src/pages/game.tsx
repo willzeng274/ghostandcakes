@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import React, { useState, useEffect, useRef, MouseEvent } from 'react';
-import { useInterval } from '../helpers/useInterval';
+import React, { useState, useEffect, useRef } from 'react';
+import useInterval from '../helpers/useInterval';
 import { Box, Button, Flex, Progress, Text } from '@chakra-ui/react';
 import useEventListener from '../helpers/listener';
 import Image from 'next/image';
@@ -196,7 +196,7 @@ const Game: NextPage = () => {
     setCakeX(randX);
     setCakeY(randY);
   }
-  function handleCakeClick(e: MouseEvent<HTMLImageElement>): void {
+  function handleCakeClick(e: React.MouseEvent<HTMLImageElement>): void {
     const cakeR: HTMLDivElement | null = CakeRef.current;
     if (!cakeR) {
       return;
@@ -210,7 +210,7 @@ const Game: NextPage = () => {
     cakeRandom();
     setCounter(counter+1);
   }
-  function handleCake2Click(e: MouseEvent<HTMLImageElement>): void {
+  function handleCake2Click(e: React.MouseEvent<HTMLImageElement>): void {
     setFrozen(50);
     const cakeR: HTMLDivElement | null = Cake2Ref.current;
     if (!cakeR) {
